@@ -160,7 +160,9 @@ int main(int argc, char *argv[])
 	glEnable(GL_DEPTH_TEST);
 
 
-	Scene myScene;
+	std::string pwd(argv[0]);
+	pwd = pwd.substr(0, pwd.find_last_of('\\') + 1);
+	Scene myScene(pwd);
 
 	// These are controlled by the states of key presses
 	// They will be used to control the camera

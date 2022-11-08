@@ -3,11 +3,14 @@
 #include <GLM/gtc/matrix_transform.hpp>
 #include "GameObject.h"
 
-GameObject::GameObject()
+GameObject::GameObject() :
+	_position(glm::vec3(0)),
+	_invModelMatrix(glm::mat4(1)),
+	_modelMatrix(glm::mat4(1)),
+	_rotation(glm::vec3(0)),
+	_mesh(NULL),
+	_material(NULL)
 {
-	// Initialise everything here
-	_mesh = NULL;
-	_material = NULL;
 }
 
 GameObject::~GameObject()

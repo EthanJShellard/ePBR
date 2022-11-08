@@ -18,7 +18,7 @@ public:
 	
 	// Currently the scene is set up in the constructor
 	// This means the object(s) are loaded, given materials and positions as well as the camera and light
-	Scene();
+	Scene(const std::string& _pwd);
 	~Scene();
 
 	// Use these to adjust the camera's orientation
