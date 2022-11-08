@@ -49,5 +49,6 @@ void main()
 		vec3 specular = vec3(0);
 		
 		// The final output colour is the emissive + ambient + diffuse + specular
-		fragColour = vec4(1.0f,1.0f,1.0f,1.0f);//vec4( emissiveColour + diffuse + specular, alpha);
+		// Removed emissive from output as it is breaking everything
+		fragColour = vec4( diffuse + specular, alpha);
 }
