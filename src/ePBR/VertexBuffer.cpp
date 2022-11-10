@@ -97,6 +97,55 @@ namespace ePBR
 		m_dirty = true;
 	}
 
+	void VertexBuffer::SetData(std::vector<glm::vec3> _newData) 
+	{
+		m_data.clear();
+		
+		// There may be a way to accelerate this significantly!! This is just quick and dirty for now.
+		for (glm::vec3 v : _newData) 
+		{
+			m_data.push_back(v.x);
+			m_data.push_back(v.y);
+			m_data.push_back(v.z);
+		}
+
+		m_numComponents = 3;
+		
+		//Data yet to be uploaded
+		m_dirty = true;
+	}
+	void VertexBuffer::SetData(std::vector<glm::vec2> _newData)
+	{
+		m_data.clear();
+
+		// There may be a way to accelerate this significantly!! This is just quick and dirty for now.
+		for (glm::vec2 v : _newData)
+		{
+			m_data.push_back(v.x);
+			m_data.push_back(v.y);
+		}
+
+		m_numComponents = 2;
+
+		//Data yet to be uploaded
+		m_dirty = true;
+	}
+	void VertexBuffer::SetData(std::vector<float> _newData)
+	{
+		m_data.clear();
+
+		// There may be a way to accelerate this significantly!! This is just quick and dirty for now.
+		for (float v : _newData)
+		{
+			m_data.push_back(v);
+		}
+
+		m_numComponents = 1;
+
+		//Data yet to be uploaded
+		m_dirty = true;
+	}
+
 	int VertexBuffer::GetComponents()
 	{
 		return m_numComponents;

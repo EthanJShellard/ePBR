@@ -17,6 +17,10 @@ namespace ePBR
 		void Add(float _x, float _y, float _z, float _w);
 		void Add(GLfloat _value);
 
+		void SetData(std::vector<glm::vec3> _newData);
+		void SetData(std::vector<glm::vec2> _newData);
+		void SetData(std::vector<float> _newData);
+
 		//Get the number of components in one unit of data for this buffer. (e.g. 3 for glm::vec3)
 		int GetComponents();
 		// Get the location of this vertex buffer. Uploads data to GPU if it has changed since last call.
