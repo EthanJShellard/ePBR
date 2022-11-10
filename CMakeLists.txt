@@ -30,7 +30,7 @@ add_library(imgui
     src/imgui/imstb_truetype.h
 )
 
-add_executable(ePBR
+add_library(ePBR
     src/ePBR/GameObject.h
     src/ePBR/GameObject.cpp
     src/ePBR/Main.cpp
@@ -40,6 +40,12 @@ add_executable(ePBR
     src/ePBR/Mesh.cpp
     src/ePBR/Scene.h
     src/ePBR/Scene.cpp
+    src/ePBR/Context.h
+    src/ePBR/Context.cpp
+)
+
+add_executable(demo
+    src/demo/main.cpp
 )
 
 target_include_directories(ePBR
@@ -52,10 +58,18 @@ target_include_directories(imgui
     PUBLIC src/ # For glew
 )
 
+target_include_directories(demo
+    PUBLIC src/ # For ePBR
+)
+
 target_link_libraries(ePBR
     ${PROJECT_SOURCE_DIR}/lib/Windows-x64/SDL2.lib
     ${PROJECT_SOURCE_DIR}/lib/Windows-x64/SDL2main.lib
     opengl32
     imgui
     glew
+)
+
+target_link_libraries(demo
+    ePBR
 )
