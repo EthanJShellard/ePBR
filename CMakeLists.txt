@@ -33,7 +33,6 @@ add_library(imgui
 add_library(ePBR
     src/ePBR/GameObject.h
     src/ePBR/GameObject.cpp
-    src/ePBR/Main.cpp
     src/ePBR/Material.h
     src/ePBR/Material.cpp
     src/ePBR/Mesh.h
