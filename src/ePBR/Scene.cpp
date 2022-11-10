@@ -29,10 +29,10 @@ namespace ePBR
 
 		// Create a game object
 		// This needs a material and a mesh
-		m_model = new GameObject();
+		m_model = std::make_shared<GameObject>();
 
 		// Create the material for the game object
-		Material* modelMaterial = new Material();
+		std::shared_ptr<Material> modelMaterial = std::make_shared<Material>();
 		// Shaders are now in files
 		modelMaterial->LoadShaders(_pwd + "data\\shaders\\vertShader.txt", _pwd + "data\\shaders\\fragShader.txt");
 		// You can set some simple material properties, these values are passed to the shader
@@ -50,7 +50,7 @@ namespace ePBR
 		m_model->SetMaterial(modelMaterial);
 
 		// The mesh is the geometry for the object
-		Mesh* modelMesh = new Mesh();
+		std::shared_ptr<Mesh> modelMesh = std::make_shared<Mesh>();
 		// Load from OBJ file. This must have triangulated geometry
 		modelMesh->LoadOBJ(_pwd + "data\\models\\teapot\\teapot3.obj");
 		// Tell the game object to use this mesh

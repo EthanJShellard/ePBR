@@ -15,8 +15,8 @@ namespace ePBR
 		GameObject();
 		~GameObject();
 
-		void SetMesh(Mesh* _input) { m_mesh = _input; }
-		void SetMaterial(Material* _input) { m_material = _input; }
+		void SetMesh(std::shared_ptr<Mesh> _input) { m_mesh = _input; }
+		void SetMaterial(std::shared_ptr<Material> _input) { m_material = _input; }
 
 		void SetPosition(float _posX, float _posY, float _posZ) { m_position.x = _posX; m_position.y = _posY; m_position.z = _posZ; }
 
@@ -34,9 +34,9 @@ namespace ePBR
 	protected:
 
 		// The actual model geometry
-		Mesh* m_mesh;
+		std::shared_ptr<Mesh> m_mesh;
 		// The material contains the shader
-		Material* m_material;
+		std::shared_ptr<Material> m_material;
 
 		// Matrix for the position and orientation of the game object
 		glm::mat4 m_modelMatrix;

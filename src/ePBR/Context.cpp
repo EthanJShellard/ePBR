@@ -383,6 +383,7 @@ namespace ePBR
 
 		// Our cleanup phase, hopefully fairly self-explanatory ;)
 		SDL_GL_DeleteContext(m_SDL_GL_Context);
+		SDL_DestroyRenderer(m_SDL_Renderer);
 		SDL_DestroyWindow(m_window);
 		SDL_Quit();
 	}

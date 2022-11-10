@@ -4,9 +4,10 @@
 
 int main(int argc, char* argv[])
 {
-	ePBR::Context context;
+	
 	try 
 	{
+		ePBR::Context context;
 		context.Test(argv[0]);
 	}
 	catch (std::runtime_error e) 

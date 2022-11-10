@@ -35,12 +35,12 @@ namespace ePBR
 		// Draws the scene from the camera's point of view
 		void Draw();
 
-		GameObject* GetObject() { return m_model; }
+		std::shared_ptr<GameObject> GetObject() { return m_model; }
 
 	protected:
 
 		// Currently one object, this could be a list of objects!
-		GameObject* m_model;
+		std::shared_ptr<GameObject> m_model;
 
 		// This matrix represents the camera's position and orientation
 		glm::mat4 m_viewMatrix;

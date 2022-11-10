@@ -3,6 +3,8 @@
 #include <GLM/gtc/matrix_transform.hpp>
 #include "GameObject.h"
 
+#include <iostream>
+
 namespace ePBR 
 {
 
@@ -10,16 +12,13 @@ namespace ePBR
 		m_position(glm::vec3(0)),
 		m_invModelMatrix(glm::mat4(1)),
 		m_modelMatrix(glm::mat4(1)),
-		m_rotation(glm::vec3(0)),
-		m_mesh(NULL),
-		m_material(NULL)
+		m_rotation(glm::vec3(0))
 	{
 	}
 
 	GameObject::~GameObject()
 	{
 		// Do any clean up here
-		delete m_mesh;
 	}
 
 	void GameObject::Update(float _deltaTs)
