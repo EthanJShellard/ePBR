@@ -45,6 +45,8 @@ add_library(ePBR
     src/ePBR/VertexBuffer.cpp
     src/ePBR/VertexArray.h
     src/ePBR/VertexArray.cpp
+    src/ePBR/Shader.h
+    src/ePBR/Shader.cpp
 )
 
 add_executable(demo
