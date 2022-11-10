@@ -41,6 +41,10 @@ add_library(ePBR
     src/ePBR/Scene.cpp
     src/ePBR/Context.h
     src/ePBR/Context.cpp
+    src/ePBR/VertexBuffer.h
+    src/ePBR/VertexBuffer.cpp
+    src/ePBR/VertexArray.h
+    src/ePBR/VertexArray.cpp
 )
 
 add_executable(demo
