@@ -17,7 +17,8 @@ namespace ePBR
 
 
 		// Set up a projection matrix
-		m_projMatrix = glm::perspective(45.0f, 1.0f, 0.1f, 100.0f);
+		// Manually set aspect for now, just for testing
+		m_projMatrix = glm::perspective(45.0f, 16.0f/9.0f, 0.1f, 100.0f);
 
 
 
@@ -69,7 +70,7 @@ namespace ePBR
 		m_model->Update(_deltaTs);
 
 		// This updates the camera's position and orientation
-		m_viewMatrix = glm::rotate(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3.5f)), m_cameraAngleX, glm::vec3(1, 0, 0)), m_cameraAngleY, glm::vec3(0, 1, 0));
+		m_viewMatrix = glm::rotate(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5f, -2.0f)), m_cameraAngleX, glm::vec3(1, 0, 0)), m_cameraAngleY, glm::vec3(0, 1, 0));
 	}
 
 	void Scene::Draw()

@@ -51,10 +51,10 @@ namespace ePBR
 		// Now we have got SDL initialised, we are ready to create a window!
 		// These are some variables to help show you what the parameters are for this function
 		// You can experiment with the numbers to see what they do
-		int winPosX = 100;
-		int winPosY = 100;
-		int winWidth = 640;
-		int winHeight = 640;
+		int winPosX = 10;
+		int winPosY = 10;
+		int winWidth = 1600;
+		int winHeight = 900;
 		m_window = SDL_CreateWindow("My Window!!!",  // The first parameter is the window title
 			winPosX, winPosY,
 			winWidth, winHeight,
@@ -123,6 +123,13 @@ namespace ePBR
 		InitSDL_GL();
 		InitGL();
 		InitImGui();
+
+		//Handle window resizing
+		SDL_MaximizeWindow(m_window);
+		int width = 0;
+		int height = 0;
+		SDL_GetWindowSize(m_window, &width, &height);
+		glViewport(0, 0, width, height);
 
 		// State to keep track of whether our window is expanded open or not
 		bool showLightingWindow = true;
