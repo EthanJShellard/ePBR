@@ -1,0 +1,31 @@
+#version 430 core
+
+// Per-vertex inputs
+layout(location = 0) in vec3 vPositionIn;
+layout(location = 1) in vec3 vNormalIn;
+layout(location = 2) in vec2 vTexCoordIn;
+
+// Uniforms
+uniform mat4 MVPMat;
+uniform mat4 modelMat;
+
+// Vertex shader outputs
+out vec2 texCoordV;
+out vec3 normalV;
+out vec3 positionV;
+
+// BE WARY OF SPACES (EYE-SPACE VS WORLD SPACE)
+
+
+void main()
+{
+    // Transform position
+    gl_Position = MVPMat * vec4(vPositionIn, 1);
+
+    // Pass through tex coords
+    texCoordV = vTexCoordIn;
+
+    // Interpolated normal
+    normalV = vec3(modelMat * vec4(vNormalIn, 1));
+    positionV = vec3(modelMat * vec4(vPositionIn, 1));
+}

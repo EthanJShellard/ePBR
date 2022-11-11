@@ -7,6 +7,7 @@
 #include <imgui/imgui_impl_opengl3.h>
 
 #include "Scene.h"
+#include "PBRMaterial.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -341,7 +342,7 @@ namespace ePBR
 			{
 				// Create a window, give it a name
 				// All ImGui commands after this to create widgets will be added to the window
-				ImGui::Begin("Controls");
+				ImGui::Begin("Controls", NULL, ImGuiWindowFlags_AlwaysAutoResize);
 
 				// This is how you add a bit of text to the window
 				ImGui::Text("Arrow keys rotate the camera");
@@ -357,6 +358,14 @@ namespace ePBR
 				glm::vec3 currentRot = myScene.GetObject()->GetRotation();
 				ImGui::SliderFloat("Object Angle", &(currentRot.y), 0.0f, 2.0f * 3.141592653589793238462643383);
 				myScene.GetObject()->SetRotation(currentRot);
+
+				float currentRoughness = myScene.GetObject()->GetPBRMaterial()->GetRoughness();
+				ImGui::SliderFloat("Object Roughness", &(currentRoughness), 0.0, 1.0);
+				myScene.GetObject()->GetPBRMaterial()->SetRoughness(currentRoughness);
+
+				float currentMetalness = myScene.GetObject()->GetPBRMaterial()->GetMetalness();
+				ImGui::SliderFloat("Object Metalness", &(currentMetalness), 0.0, 1.0);
+				myScene.GetObject()->GetPBRMaterial()->SetMetalness(currentMetalness);
 
 				// Showing how to insert text into a string and also get FPS!!
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
