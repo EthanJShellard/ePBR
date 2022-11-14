@@ -89,13 +89,13 @@ namespace ePBR
 
 	GLuint Shader::GetID()
 	{
-		if (!m_id) 
-		{
-			m_id = glCreateProgram();
-		}
-
 		if (m_dirty)
 		{
+			if (!m_id)
+			{
+				m_id = glCreateProgram();
+			}
+
 			GLint success = 0;
 			glAttachShader(m_id, m_fragID);
 			glAttachShader(m_id, m_vertID);
