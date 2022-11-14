@@ -13,6 +13,10 @@ namespace ePBR
 		std::stringstream strStream;
 		std::string stringSrc;
 
+		// Detach and delete old vertex shader
+		glDetachShader(m_id, m_vertID);
+		glDeleteShader(m_vertID);
+
 		fileRead.open(_path);
 		strStream << fileRead.rdbuf();
 		stringSrc = strStream.str();
@@ -45,6 +49,10 @@ namespace ePBR
 		std::ifstream fileRead;
 		std::stringstream strStream;
 		std::string stringSrc;
+
+		// Detach and delete old fragment shader
+		glDetachShader(m_id, m_fragID);
+		glDeleteShader(m_fragID);
 
 		fileRead.open(_path);
 		strStream << fileRead.rdbuf();
@@ -81,6 +89,11 @@ namespace ePBR
 
 	GLuint Shader::GetID()
 	{
+		if (!m_id) 
+		{
+			m_id = glCreateProgram();
+		}
+
 		if (m_dirty)
 		{
 			GLint success = 0;

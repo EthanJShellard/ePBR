@@ -19,14 +19,15 @@ namespace ePBR
 		m_MVPMatLocation(0),
 		m_modelMatLocation(0),
 		m_camPosLocation(0),
-		m_albedoTexture(NULL),
-		m_normalMap(NULL),
-		m_metalnessMap(NULL),
 		m_albedoSamplerLocation(0),
 		m_ambientOcclusionMapSamplerLocation(0),
-		m_ambientOcclusionMap(NULL),
 		m_metalnessMapSamplerLocation(0),
-		m_normalMapSamplerLocation(0)
+		m_normalMapSamplerLocation(0),
+		m_shaderProgram(std::make_shared<Shader>()),
+		m_albedoTexture(std::make_shared<Texture>()),
+		m_normalMap(std::make_shared<Texture>()),
+		m_metalnessMap(std::make_shared<Texture>()),
+		m_ambientOcclusionMap(std::make_shared<Texture>())
 	{
 	}
 
@@ -39,7 +40,8 @@ namespace ePBR
 		// OpenGL doesn't provide any functions for loading shaders from file
 
 		// The 'program' stores the shaders
-		m_shaderProgram = std::make_shared<Shader>(_vertFilename.c_str(), _fragFilename.c_str());
+		m_shaderProgram->LoadNewVertexShader(_vertFilename.c_str());
+		m_shaderProgram->LoadNewFragmentShader(_fragFilename.c_str());
 
 		// Calling GetID will compile and link the newly created shader program
 		GLint id = m_shaderProgram->GetID();
@@ -60,12 +62,6 @@ namespace ePBR
 		m_normalMapSamplerLocation = glGetUniformLocation(id, "normalMap");
 		m_metalnessMapSamplerLocation = glGetUniformLocation(id, "metalnessMap");
 		m_ambientOcclusionMapSamplerLocation = glGetUniformLocation(id, "ambientOcclusionMap");
-
-		// Allocate textures
-		m_albedoTexture = std::make_shared<Texture>();
-		m_normalMap = std::make_shared<Texture>();
-		m_metalnessMap = std::make_shared<Texture>();
-		m_ambientOcclusionMap = std::make_shared<Texture>();
 
 		return true;
 	}
