@@ -49,6 +49,8 @@ add_library(ePBR
     src/ePBR/Shader.cpp
     src/ePBR/PBRMaterial.h
     src/ePBR/PBRMaterial.cpp
+    src/ePBR/Texture.h
+    src/ePBR/Texture.cpp
 )
 
 add_executable(demo

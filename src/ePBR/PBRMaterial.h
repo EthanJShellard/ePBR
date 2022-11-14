@@ -1,6 +1,8 @@
 #ifndef EPBR_PBR_MATERIAL
 #define EPBR_PBR_MATERIAL
 
+#include "Texture.h"
+
 #include <string>
 #include <memory>
 
@@ -27,15 +29,13 @@ namespace ePBR
 		float GetRoughness() { return m_roughness; }
 		float GetMetalness() { return m_metalness; }
 
-		bool SetAlbedoTexture(std::string _fileName) { m_albedoTexture = LoadTexture(_fileName); return m_albedoTexture > 0; }
-		bool SetNormalMap(std::string _fileName) { m_normalMap = LoadTexture(_fileName); return m_normalMap > 0; }
-		bool SetMetalnessMap(std::string _fileName) { m_metalnessMap = LoadTexture(_fileName); return m_metalnessMap > 0; }
+		bool SetAlbedoTexture(std::string _fileName) { m_albedoTexture->Load(_fileName); return m_albedoTexture != NULL; }
+		bool SetNormalMap(std::string _fileName) { m_normalMap->Load(_fileName); return m_normalMap != NULL; }
+		bool SetMetalnessMap(std::string _fileName) { m_metalnessMap->Load(_fileName); return m_metalnessMap != NULL; }
 
 		void Apply(glm::mat4 _modelMatrix, glm::mat4 _invModelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projMatrix, glm::vec3 _camPos);
 
 	protected:
-
-		GLint LoadTexture(std::string _filename);
 
 		std::shared_ptr<Shader> m_shaderProgram;
 
@@ -60,10 +60,10 @@ namespace ePBR
 		float m_metalness;
 
 		// Switch to texture object when you get the chance
-		GLuint m_albedoTexture;
-		GLuint m_normalMap;
-		GLuint m_metalnessMap;
-		GLuint m_ambientOcclusionMap;
+		std::shared_ptr<Texture> m_albedoTexture;
+		std::shared_ptr<Texture> m_normalMap;
+		std::shared_ptr<Texture> m_metalnessMap;
+		std::shared_ptr<Texture> m_ambientOcclusionMap;
 	};
 }
 

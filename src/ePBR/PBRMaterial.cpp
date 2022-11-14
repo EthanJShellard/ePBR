@@ -19,12 +19,12 @@ namespace ePBR
 		m_MVPMatLocation(0),
 		m_modelMatLocation(0),
 		m_camPosLocation(0),
-		m_albedoTexture(0),
-		m_normalMap(0),
-		m_metalnessMap(0),
+		m_albedoTexture(NULL),
+		m_normalMap(NULL),
+		m_metalnessMap(NULL),
 		m_albedoSamplerLocation(0),
 		m_ambientOcclusionMapSamplerLocation(0),
-		m_ambientOcclusionMap(0),
+		m_ambientOcclusionMap(NULL),
 		m_metalnessMapSamplerLocation(0),
 		m_normalMapSamplerLocation(0)
 	{
@@ -32,10 +32,6 @@ namespace ePBR
 
 	PBRMaterial::~PBRMaterial() 
 	{
-		glDeleteTextures(1, &m_albedoTexture);
-		glDeleteTextures(1, &m_normalMap);
-		glDeleteTextures(1, &m_metalnessMap);
-		glDeleteTextures(1, &m_ambientOcclusionMap);
 	}
 
 	bool PBRMaterial::LoadShaders(std::string _vertFilename, std::string _fragFilename)
@@ -65,47 +61,13 @@ namespace ePBR
 		m_metalnessMapSamplerLocation = glGetUniformLocation(id, "metalnessMap");
 		m_ambientOcclusionMapSamplerLocation = glGetUniformLocation(id, "ambientOcclusionMap");
 
+		// Allocate textures
+		m_albedoTexture = std::make_shared<Texture>();
+		m_normalMap = std::make_shared<Texture>();
+		m_metalnessMap = std::make_shared<Texture>();
+		m_ambientOcclusionMap = std::make_shared<Texture>();
+
 		return true;
-	}
-
-	GLint PBRMaterial::LoadTexture(std::string _fileName) 
-	{
-		// Load SDL surface
-		SDL_Surface* image = SDL_LoadBMP(_fileName.c_str());
-
-		if (!image) // Check it worked
-		{
-			std::cerr << "WARNING: could not load BMP image: " << _fileName << std::endl;
-			return 0;
-		}
-
-		// Create OpenGL texture
-		unsigned int texName = 0;
-		glGenTextures(1, &texName);
-
-		glBindTexture(GL_TEXTURE_2D, texName);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-		// By default, OpenGL mag filter is linear
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		// By default, OpenGL min filter will use mipmaps
-		// We therefore either need to tell it to use linear or generate a mipmap
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-		// SDL loads images in BGR order
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->w, image->h, 0, GL_BGR, GL_UNSIGNED_BYTE, image->pixels);
-
-		//glGenerateMipmap(GL_TEXTURE_2D);
-
-		SDL_FreeSurface(image);
-
-		//glBindTexture(GL_TEXTURE_2D, 0);
-
-
-		return texName;
 	}
 
 	void PBRMaterial::Apply(glm::mat4 _modelMatrix, glm::mat4 _invModelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projMatrix, glm::vec3 _camPos) 
@@ -125,15 +87,15 @@ namespace ePBR
 		glUniform1f(m_roughnessLocation, m_roughness);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m_albedoTexture);
+		glBindTexture(GL_TEXTURE_2D, m_albedoTexture->GetID());
 
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, m_normalMap);
+		glBindTexture(GL_TEXTURE_2D, m_normalMap->GetID());
 
 		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, m_metalnessMap);
+		glBindTexture(GL_TEXTURE_2D, m_metalnessMap->GetID());
 
 		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, m_ambientOcclusionMap);
+		glBindTexture(GL_TEXTURE_2D, m_ambientOcclusionMap->GetID());
 	}
 }
