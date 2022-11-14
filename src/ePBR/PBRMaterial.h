@@ -20,8 +20,6 @@ namespace ePBR
 
 		bool LoadShaders(std::string _vertFilename, std::string _fragFilename);
 
-		void SetMatrices(glm::mat4 _modelMatrix, glm::mat4 _invModelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projMatrix);
-
 		void SetAlbedo(glm::vec3 _input) { m_albedo = _input; }
 		void SetRoughness(float _input) { m_roughness = _input; }
 		void SetMetalness(float _input) { m_metalness = _input; }
@@ -33,7 +31,7 @@ namespace ePBR
 		bool SetNormalMap(std::string _fileName) { m_normalMap = LoadTexture(_fileName); return m_normalMap > 0; }
 		bool SetMetalnessMap(std::string _fileName) { m_metalnessMap = LoadTexture(_fileName); return m_metalnessMap > 0; }
 
-		void Apply(glm::vec3 camPos);
+		void Apply(glm::mat4 _modelMatrix, glm::mat4 _invModelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projMatrix, glm::vec3 _camPos);
 
 	protected:
 

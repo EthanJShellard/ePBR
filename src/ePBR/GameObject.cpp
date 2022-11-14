@@ -14,7 +14,8 @@ namespace ePBR
 		m_position(glm::vec3(0)),
 		m_invModelMatrix(glm::mat4(1)),
 		m_modelMatrix(glm::mat4(1)),
-		m_rotation(glm::vec3(0))
+		m_rotation(glm::vec3(0)),
+		m_camPos(glm::vec3(0))
 	{
 	}
 
@@ -32,7 +33,7 @@ namespace ePBR
 
 	}
 
-	void GameObject::Draw(glm::mat4 _viewMatrix, glm::mat4 _projMatrix)
+	void GameObject::Draw(glm::mat4 _viewMatrix, glm::mat4 _projMatrix, glm::vec3 _camPos)
 	{
 		if (m_mesh != NULL)
 		{
@@ -58,11 +59,8 @@ namespace ePBR
 				m_modelMatrix = glm::rotate(m_modelMatrix, m_rotation.y, glm::vec3(0, 1, 0));
 				m_invModelMatrix = glm::rotate(glm::mat4(1.0f), -m_rotation.y, glm::vec3(0, 1, 0));
 
-				// Give all the matrices to the material
-				// This makes sure they are sent to the shader
-				m_PBRMaterial->SetMatrices(m_modelMatrix, m_invModelMatrix, _viewMatrix, _projMatrix);
 				// This activates the shader
-				m_PBRMaterial->Apply(m_camPos);
+				m_PBRMaterial->Apply(m_modelMatrix, m_invModelMatrix, _viewMatrix, _projMatrix, _camPos);
 			}
 
 			// Sends the mesh data down the pipeline

@@ -22,7 +22,7 @@ namespace ePBR
 		// Manually set aspect for now, just for testing
 		m_projMatrix = glm::perspective(45.0f, 16.0f/9.0f, 0.1f, 100.0f);
 
-
+		m_camPos = glm::vec3(0);
 
 
 		// Set up your scene here
@@ -64,8 +64,8 @@ namespace ePBR
 		// The mesh is the geometry for the object
 		std::shared_ptr<Mesh> modelMesh = std::make_shared<Mesh>();
 		// Load from OBJ file. This must have triangulated geometry
-		//modelMesh->LoadOBJ(_pwd + "data\\models\\sphere\\triangulated.obj");
-		modelMesh->LoadOBJ(_pwd + "data\\models\\teapot\\teapot3.obj");
+		modelMesh->LoadOBJ(_pwd + "data\\models\\sphere\\triangulated.obj");
+		//modelMesh->LoadOBJ(_pwd + "data\\models\\teapot\\teapot3.obj");
 		// Tell the game object to use this mesh
 		m_model->SetMesh(modelMesh);
 
@@ -83,13 +83,13 @@ namespace ePBR
 
 		// This updates the camera's position and orientation
 		m_viewMatrix = glm::rotate(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5f, -2.0f)), m_cameraAngleX, glm::vec3(1, 0, 0)), m_cameraAngleY, glm::vec3(0, 1, 0));
-		m_model->m_camPos = glm::inverse(m_viewMatrix) * glm::mat4(1) * glm::vec4(0,0,0,1);
+		m_camPos = glm::inverse(m_viewMatrix) * glm::mat4(1) * glm::vec4(0,0,0,1);
 	}
 
 	void Scene::Draw()
 	{
 		// Draw that model, giving it the camera's position and projection
-		m_model->Draw(m_viewMatrix, m_projMatrix);
+		m_model->Draw(m_viewMatrix, m_projMatrix, m_camPos);
 
 	}
 

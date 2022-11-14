@@ -34,7 +34,7 @@ namespace ePBR
 		void Update(float _deltaTs);
 
 		// Need to give it the camera's orientation and projection
-		void Draw(glm::mat4 _viewMatrix, glm::mat4 _projMatrix);
+		void Draw(glm::mat4 _viewMatrix, glm::mat4 _projMatrix, glm::vec3 _camPos);
 
 		// TEMPORARY For testing purposes only
 		glm::vec3 m_camPos;

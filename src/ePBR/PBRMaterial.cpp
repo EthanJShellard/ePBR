@@ -21,7 +21,12 @@ namespace ePBR
 		m_camPosLocation(0),
 		m_albedoTexture(0),
 		m_normalMap(0),
-		m_metalnessMap(0)
+		m_metalnessMap(0),
+		m_albedoSamplerLocation(0),
+		m_ambientOcclusionMapSamplerLocation(0),
+		m_ambientOcclusionMap(0),
+		m_metalnessMapSamplerLocation(0),
+		m_normalMapSamplerLocation(0)
 	{
 	}
 
@@ -103,20 +108,16 @@ namespace ePBR
 		return texName;
 	}
 
-	void PBRMaterial::SetMatrices(glm::mat4 _modelMatrix, glm::mat4 _invModelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projMatrix)
+	void PBRMaterial::Apply(glm::mat4 _modelMatrix, glm::mat4 _invModelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projMatrix, glm::vec3 _camPos) 
 	{
 		glUseProgram(m_shaderProgram->GetID());
 
 		// Calculate MVP
 		glm::mat4 MVP = _projMatrix * _viewMatrix * _modelMatrix;
 
+		// Upload matrices
 		glUniformMatrix4fv(m_modelMatLocation, 1, GL_FALSE, glm::value_ptr(_modelMatrix));
 		glUniformMatrix4fv(m_MVPMatLocation, 1, GL_FALSE, glm::value_ptr(MVP));
-	}
-
-	void PBRMaterial::Apply(glm::vec3 _camPos) 
-	{
-		glUseProgram(m_shaderProgram->GetID());
 
 		glUniform3fv(m_camPosLocation, 1, glm::value_ptr(_camPos));
 		glUniform3fv(m_albedoLocation, 1, glm::value_ptr(m_albedo));

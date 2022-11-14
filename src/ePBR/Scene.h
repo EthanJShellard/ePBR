@@ -54,6 +54,9 @@ namespace ePBR
 		// Position of the single point-light in the scene
 		glm::vec3 m_lightPosition;
 
+		// Position of the camera
+		glm::vec3 m_camPos;
+
 
 	};
 }
