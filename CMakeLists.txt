@@ -74,6 +74,7 @@ target_include_directories(demo
 target_link_libraries(ePBR
     ${PROJECT_SOURCE_DIR}/lib/Windows-x64/SDL2.lib
     ${PROJECT_SOURCE_DIR}/lib/Windows-x64/SDL2main.lib
+    ${PROJECT_SOURCE_DIR}/lib/Windows-x64/assimp-vc143-mt.lib
     opengl32
     imgui
     glew
