@@ -22,12 +22,14 @@ namespace ePBR
 		m_albedoSamplerLocation(0),
 		m_ambientOcclusionMapSamplerLocation(0),
 		m_metalnessMapSamplerLocation(0),
+		m_roughnessMapSamplerLocation(0),
 		m_normalMapSamplerLocation(0),
 		m_shaderProgram(std::make_shared<Shader>()),
 		m_albedoTexture(std::make_shared<Texture>()),
 		m_normalMap(std::make_shared<Texture>()),
 		m_metalnessMap(std::make_shared<Texture>()),
-		m_ambientOcclusionMap(std::make_shared<Texture>())
+		m_ambientOcclusionMap(std::make_shared<Texture>()),
+		m_roughnessMap(std::make_shared<Texture>())
 	{
 	}
 
@@ -61,6 +63,7 @@ namespace ePBR
 		m_albedoSamplerLocation = glGetUniformLocation(id, "albedoMap");
 		m_normalMapSamplerLocation = glGetUniformLocation(id, "normalMap");
 		m_metalnessMapSamplerLocation = glGetUniformLocation(id, "metalnessMap");
+		m_roughnessMapSamplerLocation = glGetUniformLocation(id, "roughnessMap");
 		m_ambientOcclusionMapSamplerLocation = glGetUniformLocation(id, "ambientOcclusionMap");
 
 		return true;
@@ -92,6 +95,9 @@ namespace ePBR
 		glBindTexture(GL_TEXTURE_2D, m_metalnessMap->GetID());
 
 		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, m_roughnessMap->GetID());
+
+		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, m_ambientOcclusionMap->GetID());
 	}
 }

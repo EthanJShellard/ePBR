@@ -146,6 +146,16 @@ namespace ePBR
 		m_dirty = true;
 	}
 
+	void VertexBuffer::SetData(const float* _newData, const size_t _size, const int _components)
+	{
+		// Replace data with new data
+		m_data.assign(_newData, _newData + _size);
+
+		// Set components and dirty the object
+		m_numComponents = _components;
+		m_dirty = true;
+	}
+
 	int VertexBuffer::GetComponents()
 	{
 		return m_numComponents;

@@ -2,6 +2,10 @@
 #include "Mesh.h"
 #include "VertexBuffer.h"
 
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -22,10 +26,10 @@ namespace ePBR
 	}
 
 
-	void Mesh::LoadOBJ(std::string m_filename)
+	void Mesh::LoadOBJ(std::string _filename)
 	{
 		// Find file
-		std::ifstream inputFile(m_filename);
+		std::ifstream inputFile(_filename);
 
 		if (inputFile.is_open())
 		{
@@ -157,7 +161,7 @@ namespace ePBR
 		}
 		else
 		{
-			std::cerr << "WARNING: File not found: " << m_filename << std::endl;
+			std::cerr << "WARNING: File not found: " << _filename << std::endl;
 		}
 	}
 

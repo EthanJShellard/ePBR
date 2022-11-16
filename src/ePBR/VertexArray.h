@@ -1,3 +1,6 @@
+#ifndef EPBR_VERTEX_ARRAY
+#define EPBR_VERTEX_ARRAY
+
 #include <memory>
 #include <vector>
 
@@ -30,3 +33,5 @@ namespace ePBR
 		std::vector< std::shared_ptr<VertexBuffer> > m_buffers;
 	};
 }
+
+#endif // EPBR_VERTEX_ARRAY

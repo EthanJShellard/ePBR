@@ -11,6 +11,7 @@
 
 namespace ePBR 
 {
+	class Model;
 
 	// The scene contains objects, the camera and light
 	// It is responsible for coordinating these things
@@ -36,11 +37,12 @@ namespace ePBR
 		void Draw();
 
 		std::shared_ptr<GameObject> GetObject() { return m_model; }
-
+		std::shared_ptr<Model> GetModel() { return m_testModel; }
 	protected:
 
 		// Currently one object, this could be a list of objects!
 		std::shared_ptr<GameObject> m_model;
+		std::shared_ptr<Model> m_testModel;
 
 		// This matrix represents the camera's position and orientation
 		glm::mat4 m_viewMatrix;

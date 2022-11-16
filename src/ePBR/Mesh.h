@@ -23,6 +23,8 @@ namespace ePBR
 		// OBJ file must be triangulated
 		void LoadOBJ(std::string _filename);
 
+		void SetVertexArray(std::shared_ptr<VertexArray> _newVAO) { m_VAO = _newVAO; };
+
 		// Draws the mesh - must have shaders applied for this to display!
 		void Draw();
 

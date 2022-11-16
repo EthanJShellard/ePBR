@@ -6,8 +6,11 @@
 #include <imgui/imgui_impl_sdl.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include <assimp/scene.h>
+
 #include "Scene.h"
 #include "PBRMaterial.h"
+#include "Model.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -359,13 +362,13 @@ namespace ePBR
 				ImGui::SliderFloat("Object Angle", &(currentRot.y), 0.0f, 2.0f * 3.141592653589793238462643383);
 				myScene.GetObject()->SetRotation(currentRot);
 
-				float currentRoughness = myScene.GetObject()->GetPBRMaterial()->GetRoughness();
+				float currentRoughness = myScene.GetModel()->GetMaterials()[0]->GetRoughness();
 				ImGui::SliderFloat("Object Roughness", &(currentRoughness), 0.0, 1.0);
-				myScene.GetObject()->GetPBRMaterial()->SetRoughness(currentRoughness);
+				myScene.GetModel()->GetMaterials()[0]->SetRoughness(currentRoughness);
 
-				float currentMetalness = myScene.GetObject()->GetPBRMaterial()->GetMetalness();
+				float currentMetalness = myScene.GetModel()->GetMaterials()[0]->GetMetalness();
 				ImGui::SliderFloat("Object Metalness", &(currentMetalness), 0.0, 1.0);
-				myScene.GetObject()->GetPBRMaterial()->SetMetalness(currentMetalness);
+				myScene.GetModel()->GetMaterials()[0]->SetMetalness(currentMetalness);
 
 				// Showing how to insert text into a string and also get FPS!!
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);

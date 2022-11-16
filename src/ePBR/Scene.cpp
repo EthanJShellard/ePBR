@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 
 #include "PBRMaterial.h"
+#include "Model.h"
 
 namespace ePBR 
 {
@@ -56,19 +57,22 @@ namespace ePBR
 		std::shared_ptr<PBRMaterial> material = std::make_shared<PBRMaterial>();
 		material->LoadShaders(_pwd + "data\\shaders\\PBRVert.txt", _pwd + "data\\shaders\\PBRFrag.txt");
 		material->SetAlbedo(glm::vec3(1,0,0));
-		material->SetMetalness(1.0);
-		material->SetRoughness(0.2);
+		//material->SetMetalness(1.0);
+		//material->SetRoughness(0.2);
 
-		m_model->SetMaterial(material);
+		//m_model->SetMaterial(material);
 
 		// The mesh is the geometry for the object
-		std::shared_ptr<Mesh> modelMesh = std::make_shared<Mesh>();
-		// Load from OBJ file. This must have triangulated geometry
-		modelMesh->LoadOBJ(_pwd + "data\\models\\sphere\\triangulated.obj");
-		//modelMesh->LoadOBJ(_pwd + "data\\models\\teapot\\teapot3.obj");
-		// Tell the game object to use this mesh
-		m_model->SetMesh(modelMesh);
+		//std::shared_ptr<Mesh> modelMesh = std::make_shared<Mesh>();
+		//// Load from OBJ file. This must have triangulated geometry
+		//modelMesh->LoadOBJ(_pwd + "data\\models\\sphere\\triangulated.obj");
+		////modelMesh->LoadOBJ(_pwd + "data\\models\\teapot\\teapot3.obj");
+		//// Tell the game object to use this mesh
+		//m_model->SetMesh(modelMesh);
 
+		m_testModel = std::make_shared<Model>();
+		m_testModel->Load(_pwd + "data\\models\\sphere\\triangulated.obj");
+		m_testModel->SetMaterial(0, material);
 	}
 
 	Scene::~Scene()
@@ -89,8 +93,9 @@ namespace ePBR
 	void Scene::Draw()
 	{
 		// Draw that model, giving it the camera's position and projection
-		m_model->Draw(m_viewMatrix, m_projMatrix, m_camPos);
-
+		//m_model->Draw(m_viewMatrix, m_projMatrix, m_camPos);
+		// For testing just using identity for model matrix
+		m_testModel->Draw(glm::mat4(1), m_viewMatrix, m_projMatrix, m_camPos);
 	}
 
 }

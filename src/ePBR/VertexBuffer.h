@@ -20,6 +20,7 @@ namespace ePBR
 		void SetData(std::vector<glm::vec3> _newData);
 		void SetData(std::vector<glm::vec2> _newData);
 		void SetData(std::vector<float> _newData);
+		void SetData(const float* _newData, const size_t _size, const int _components);
 
 		//Get the number of components in one unit of data for this buffer. (e.g. 3 for glm::vec3)
 		int GetComponents();
