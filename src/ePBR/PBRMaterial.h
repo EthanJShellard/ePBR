@@ -20,7 +20,7 @@ namespace ePBR
 		PBRMaterial();
 		~PBRMaterial();
 
-		void SetShader(std::shared_ptr<Shader> _newShader) { m_shaderProgram = _newShader; };
+		void SetShader(std::shared_ptr<Shader> _newShader);
 		bool LoadShaders(std::string _vertFilename, std::string _fragFilename);
 
 		void SetAlbedo(glm::vec3 _input) { m_albedo = _input; }

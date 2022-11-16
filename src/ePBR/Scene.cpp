@@ -73,11 +73,11 @@ namespace ePBR
 		//m_model->SetMesh(modelMesh);
 
 		m_testModel = std::make_shared<Model>();
-		m_testModel->Load(_pwd + "data\\models\\teapot\\teapot3.obj");
+		m_testModel->Load(_pwd + "data\\models\\old_lantern\\lantern_fbx.fbx");
 
 		std::shared_ptr<Shader> shaderProgram = std::make_shared<Shader>(_pwd + "data\\shaders\\PBRVert.txt", _pwd + "data\\shaders\\PBRFrag.txt");
 		// While we're using a model that isn't set up properly to reference materials, so gonna set it here
-		m_testModel->SetMaterial(0, material);
+		//m_testModel->SetMaterial(0, material);
 
 		for (auto model : m_testModel->GetMaterials()) 
 		{

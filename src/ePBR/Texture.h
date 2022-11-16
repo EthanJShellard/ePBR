@@ -12,7 +12,7 @@ namespace ePBR
 		GLuint m_ID;
 
 	public:
-		void Load(std::string _fileName, int _streams = 3);
+		void Load(std::string _fileName);
 		const GLuint GetID() const;
 
 		Texture(std::string _fileName);

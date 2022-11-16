@@ -15,6 +15,35 @@
 
 namespace ePBR 
 {
+	void LoadTextureOfType(aiTextureType _type, aiMaterial* _material, std::unordered_map<std::string, std::shared_ptr<Texture>>& _matMap, const std::string& _modelDirectory) 
+	{
+		if (_material->GetTextureCount(_type))
+		{
+			aiString path;
+			_material->GetTexture(_type, 0, &path);
+
+			if (_matMap.find(path.data) != _matMap.end())
+			{
+				return;
+			}
+
+			// Remove extraneous information at beginning of path
+			std::string sPath = path.data;
+			if (sPath.at(0) == '.') 
+			{
+				sPath = sPath.substr(3);
+			}
+			else if (sPath.at(0) == '\\') 
+			{
+				sPath = sPath.substr(1);
+			}
+
+			std::cout << "Loading " << path.data << std::endl;
+
+			_matMap[path.data] = std::make_shared<Texture>(_modelDirectory + sPath);
+		}
+	}
+
 	void Model::Load(const std::string& _filename)
 	{
 		std::ifstream fin(_filename.c_str());
@@ -38,8 +67,11 @@ namespace ePBR
 			throw std::runtime_error("Import failed from file at " + _filename);
 		}
 
+		// Get model location
+		std::string locString = _filename.substr(0, _filename.find_last_of('\\') + 1);
+
 		// Load Materials
-		std::unordered_map<char*, std::shared_ptr<Texture>> matMap;
+		std::unordered_map<std::string, std::shared_ptr<Texture>> matMap;
 
 		if (scene->HasMaterials()) 
 		{
@@ -48,48 +80,15 @@ namespace ePBR
 				aiMaterial* material = scene->mMaterials[i];
 
 				// We're only going to load a single texture for the types we want at the moment
+				LoadTextureOfType(aiTextureType_BASE_COLOR, material, matMap, locString);
+				LoadTextureOfType(aiTextureType_NORMALS, material, matMap, locString);
+				LoadTextureOfType(aiTextureType_METALNESS, material, matMap, locString);
+				LoadTextureOfType(aiTextureType_DIFFUSE_ROUGHNESS, material, matMap, locString);
+				LoadTextureOfType(aiTextureType_AMBIENT_OCCLUSION, material, matMap, locString);
 
-				// Diffuse/Albedo
-				if (material->GetTextureCount(aiTextureType_DIFFUSE)) 
-				{
-					aiString path;
-					material->GetTexture(aiTextureType_DIFFUSE, 0, &path);
-					matMap[path.data] = std::make_shared<Texture>(path.data);
-				}
-
-				// Normal map
-				if (material->GetTextureCount(aiTextureType_NORMALS)) 
-				{
-					aiString path;
-					material->GetTexture(aiTextureType_NORMALS, 0, &path);
-					matMap[path.data] = std::make_shared<Texture>(path.data);
-				}
-
-				// Metalness map
-				if (material->GetTextureCount(aiTextureType_METALNESS)) 
-				{
-					aiString path;
-					material->GetTexture(aiTextureType_METALNESS, 0, &path);
-					matMap[path.data] = std::make_shared<Texture>(path.data);
-				}
-
-				// Roughness
-				if (material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS))
-				{
-					aiString path;
-					material->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &path);
-					matMap[path.data] = std::make_shared<Texture>(path.data);
-				}
-
-				// Ambient occlusion
-				if (material->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION))
-				{
-					aiString path;
-					material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &path);
-					matMap[path.data] = std::make_shared<Texture>(path.data);
-				}
+				std::cout << "Loaded material: " << material->GetName().data << "\n";
 			}
-			std::cout << "Loaded " << scene->mNumMaterials << " materials...\n";
+			
 		}
 
 
@@ -170,9 +169,9 @@ namespace ePBR
 				aiString path;
 
 				// Get diffuse
-				if (mat->GetTextureCount(aiTextureType_DIFFUSE)) 
+				if (mat->GetTextureCount(aiTextureType_BASE_COLOR)) 
 				{
-					mat->GetTexture(aiTextureType_DIFFUSE, 0, &path);
+					mat->GetTexture(aiTextureType_BASE_COLOR, 0, &path);
 					pbrMaterial->SetAlbedoTexture(matMap[path.data]);
 				}
 				// Get normal

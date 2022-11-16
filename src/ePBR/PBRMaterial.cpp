@@ -69,6 +69,32 @@ namespace ePBR
 		return true;
 	}
 
+	void PBRMaterial::SetShader(std::shared_ptr<Shader> _newShader)
+	{
+		m_shaderProgram = _newShader;
+
+		// Calling GetID will compile and link the newly created shader program
+		GLint id = m_shaderProgram->GetID();
+
+		glUseProgram(id);
+
+		// Get uniform locations
+		m_modelMatLocation = glGetUniformLocation(id, "modelMat");
+		m_MVPMatLocation = glGetUniformLocation(id, "MVPMat");
+
+		m_camPosLocation = glGetUniformLocation(id, "camPos");
+		m_albedoLocation = glGetUniformLocation(id, "albedo");
+		m_metalnessLocation = glGetUniformLocation(id, "metalness");
+		m_roughnessLocation = glGetUniformLocation(id, "roughness");
+
+		// Get texture sampler locations
+		m_albedoSamplerLocation = glGetUniformLocation(id, "albedoMap");
+		m_normalMapSamplerLocation = glGetUniformLocation(id, "normalMap");
+		m_metalnessMapSamplerLocation = glGetUniformLocation(id, "metalnessMap");
+		m_roughnessMapSamplerLocation = glGetUniformLocation(id, "roughnessMap");
+		m_ambientOcclusionMapSamplerLocation = glGetUniformLocation(id, "ambientOcclusionMap");
+	}
+
 	void PBRMaterial::Apply(glm::mat4 _modelMatrix, glm::mat4 _invModelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projMatrix, glm::vec3 _camPos) 
 	{
 		glUseProgram(m_shaderProgram->GetID());
