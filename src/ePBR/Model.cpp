@@ -89,6 +89,7 @@ namespace ePBR
 					matMap[path.data] = std::make_shared<Texture>(path.data);
 				}
 			}
+			std::cout << "Loaded " << scene->mNumMaterials << " materials...\n";
 		}
 
 
@@ -143,6 +144,24 @@ namespace ePBR
 					vao->SetBuffer(normalBuffer, 1);
 
 					std::cout << "Loaded " << mesh->mNumVertices << " normals...\n";
+				}
+
+				// Load texture coordinates
+				if (mesh->mTextureCoords[0]) 
+				{
+					std::shared_ptr<VertexBuffer> uvBuffer = std::make_shared<VertexBuffer>();
+
+					// Cast aiVector3D* to float* doesn't quite work. If you can create an elegant conversion we can do the below
+					//normalBuffer->SetData((const float*)mesh->mNormals, mesh->mNumVertices, 3);
+					for (int i = 0; i < mesh->mNumVertices; i++)
+					{
+						uvBuffer->Add(glm::vec3(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y, mesh->mTextureCoords[0][i].z));
+					}
+
+					// Link VBO to VAO
+					vao->SetBuffer(uvBuffer, 2);
+
+					std::cout << "Loaded " << mesh->mNumVertices << " texture coordinates...\n";
 				}
 
 				// Find and assign material textures

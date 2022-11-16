@@ -141,6 +141,19 @@ namespace ePBR
 		m_id = glCreateProgram();
 	}
 
+	Shader::Shader(const std::string& _vertexPath, const std::string& _fragmentPath)
+	{
+		//Initialise variables
+		m_dirty = true;
+		m_vertID = 0;
+		m_fragID = 0;
+
+		LoadNewVertexShader(_vertexPath.c_str());
+		LoadNewFragmentShader(_fragmentPath.c_str());
+
+		m_id = glCreateProgram();
+	}
+
 	Shader::Shader()
 	{
 		//Initialise variables

@@ -21,6 +21,7 @@ uniform float ambientOcclusion;
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
 uniform sampler2D metalnessMap;
+uniform sampler2D roughnessMap;
 uniform sampler2D ambientOcclusionMap;
 
 // This is the output, it is the fragment's (pixel's) colour
@@ -78,10 +79,13 @@ void main()
     vec3 normal = normalize(normalV);
     vec3 viewDir = normalize(camPos - positionV);
 
+    // Sample albedo
+    vec3 texAlbedo = vec3(texture(albedoMap,vec2(texCoordV.x,1-texCoordV.y)));
+
     // Need surface reflection at zero incidence (from directly above)
     // We approximate dielectrics to 0.04 and interpolate based on metalness.
     vec3 F0 = vec3(0.04);
-    F0 = mix(F0, albedo, metalness);
+    F0 = mix(F0, texAlbedo, metalness);
 
     // Test 4 set lights
     vec3 lightPositions[1] = vec3[1]
@@ -131,11 +135,11 @@ void main()
 
         // Calculate outgoing reflectance value
         float nDotL = max(dot(normal, lightDir), 0.0);
-        Lo += (kD * albedo / PI + specular) * radiance * nDotL;
+        Lo += (kD * texAlbedo / PI + specular) * radiance * nDotL;
     }
 
     // Fake ambient
-    vec3 ambient = vec3(0.001) * albedo/* * ao*/;
+    vec3 ambient = vec3(0.001) * texAlbedo/* * ao*/;
     // Final lit colour
     vec3 colour = ambient + Lo;
 

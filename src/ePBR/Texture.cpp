@@ -1,12 +1,13 @@
 #include "Texture.h"
 
-#include <SDL2/SDL.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 #include <stdexcept>
 
 namespace ePBR 
 {
-	void Texture::Load(std::string _fileName) 
+	void Texture::Load(std::string _fileName, int _streams) 
 	{
 		// If we've already loaded a texture, unload it first
 		if (m_ID) 
@@ -15,11 +16,12 @@ namespace ePBR
 		}
 
 		// Load SDL surface
-		SDL_Surface* image = SDL_LoadBMP(_fileName.c_str());
+		int width, height;
+		stbi_uc* data = stbi_load(_fileName.c_str(), &width, &height, NULL, _streams);
 
-		if (!image) // Check it worked
+		if (!data) // Check it worked
 		{
-			throw std::runtime_error("WARNING: could not load BMP image: " + _fileName);
+			throw std::runtime_error("WARNING: could not load texture: " + _fileName);
 		}
 
 		// Create OpenGL texture
@@ -38,11 +40,12 @@ namespace ePBR
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 		// SDL loads images in BGR order
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->w, image->h, 0, GL_BGR, GL_UNSIGNED_BYTE, image->pixels);
+		// Will need to handle different formats!!
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
 		//glGenerateMipmap(GL_TEXTURE_2D);
 
-		SDL_FreeSurface(image);
+		free(data);
 	}
 
 	const GLuint Texture::GetID() const 

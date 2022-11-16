@@ -1,4 +1,5 @@
 #include <GL/glew.h>
+#include <string>
 
 namespace ePBR
 {
@@ -13,6 +14,7 @@ namespace ePBR
 		GLuint GetID();
 
 		Shader(const char* _vertexPath, const char* _fragmentPath);
+		Shader(const std::string& _vertexPath, const std::string& _fragmentPath);
 		Shader();
 		~Shader();
 	protected:

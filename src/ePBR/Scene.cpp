@@ -6,6 +6,7 @@
 
 #include "PBRMaterial.h"
 #include "Model.h"
+#include "Shader.h"
 
 namespace ePBR 
 {
@@ -55,8 +56,9 @@ namespace ePBR
 
 		// Test PBR Material
 		std::shared_ptr<PBRMaterial> material = std::make_shared<PBRMaterial>();
+		material->SetAlbedoTexture(_pwd + "data\\models\\teapot\\TeapotColourMap.bmp");
 		material->LoadShaders(_pwd + "data\\shaders\\PBRVert.txt", _pwd + "data\\shaders\\PBRFrag.txt");
-		material->SetAlbedo(glm::vec3(1,0,0));
+		//material->SetAlbedo(glm::vec3(1,0,0));
 		//material->SetMetalness(1.0);
 		//material->SetRoughness(0.2);
 
@@ -71,8 +73,17 @@ namespace ePBR
 		//m_model->SetMesh(modelMesh);
 
 		m_testModel = std::make_shared<Model>();
-		m_testModel->Load(_pwd + "data\\models\\sphere\\triangulated.obj");
+		m_testModel->Load(_pwd + "data\\models\\teapot\\teapot3.obj");
+
+		std::shared_ptr<Shader> shaderProgram = std::make_shared<Shader>(_pwd + "data\\shaders\\PBRVert.txt", _pwd + "data\\shaders\\PBRFrag.txt");
+		// While we're using a model that isn't set up properly to reference materials, so gonna set it here
 		m_testModel->SetMaterial(0, material);
+
+		for (auto model : m_testModel->GetMaterials()) 
+		{
+			model->SetShader(shaderProgram);
+		}
+		
 	}
 
 	Scene::~Scene()
