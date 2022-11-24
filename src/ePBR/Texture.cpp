@@ -49,7 +49,7 @@ namespace ePBR
 		else if (components == 1) 
 		{
 			// Metalness texture not loading data... stb_image's fault?
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
 		}
 		else if (components == 3)
 		{

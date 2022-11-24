@@ -56,7 +56,10 @@ namespace ePBR
 
 		// Test PBR Material
 		std::shared_ptr<PBRMaterial> material = std::make_shared<PBRMaterial>();
-		material->SetAlbedoTexture(_pwd + "data\\models\\teapot\\TeapotColourMap.bmp");
+		material->SetAlbedoTexture(_pwd + "data\\textures\\rustediron2\\rustediron2_basecolor.png");
+		material->SetMetalnessMap(_pwd + "data\\textures\\rustediron2\\rustediron2_metallic.png");
+		material->SetNormalMap(_pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
+		material->SetRoughnessMap(_pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
 		material->LoadShaders(_pwd + "data\\shaders\\PBRVert.txt", _pwd + "data\\shaders\\PBRFrag.txt");
 		//material->SetAlbedo(glm::vec3(1,0,0));
 		//material->SetMetalness(1.0);
@@ -65,15 +68,18 @@ namespace ePBR
 		//m_model->SetMaterial(material);
 
 		// The mesh is the geometry for the object
-		//std::shared_ptr<Mesh> modelMesh = std::make_shared<Mesh>();
+		std::shared_ptr<Mesh> modelMesh = std::make_shared<Mesh>();
 		//// Load from OBJ file. This must have triangulated geometry
-		//modelMesh->LoadOBJ(_pwd + "data\\models\\sphere\\triangulated.obj");
+		modelMesh->LoadOBJ(_pwd + "data\\models\\sphere\\triangulated.obj");
 		////modelMesh->LoadOBJ(_pwd + "data\\models\\teapot\\teapot3.obj");
 		//// Tell the game object to use this mesh
 		//m_model->SetMesh(modelMesh);
 
+		
 		m_testModel = std::make_shared<Model>();
-		m_testModel->Load(_pwd + "data\\models\\old_lantern\\lantern_fbx.fbx");
+		m_testModel->SetMesh(0, modelMesh);
+		m_testModel->SetMaterial(0, material);
+		//m_testModel->Load(_pwd + "data\\models\\old_lantern\\lantern_fbx.fbx");
 
 		std::shared_ptr<Shader> shaderProgram = std::make_shared<Shader>(_pwd + "data\\shaders\\PBRVert.txt", _pwd + "data\\shaders\\PBRFrag.txt");
 		// While we're using a model that isn't set up properly to reference materials, so gonna set it here

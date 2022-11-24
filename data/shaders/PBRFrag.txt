@@ -77,15 +77,20 @@ float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 void main()
 {
     vec3 normal = normalize(normalV);
+    //vec3 normal = vec3(texture(albedoMap, vec2(texCoordV.x, texCoordV.y)));
     vec3 viewDir = normalize(camPos - positionV);
 
     // Sample albedo
     vec3 texAlbedo = vec3(texture(albedoMap,vec2(texCoordV.x,1-texCoordV.y)));
+    // Sample metalness
+    float texMetalness = texture(metalnessMap, vec2(texCoordV.x, texCoordV.y)).x;
+    // Sample roughness
+    float texRoughness = texture(roughnessMap, vec2(texCoordV.x, texCoordV.y)).x;
 
     // Need surface reflection at zero incidence (from directly above)
     // We approximate dielectrics to 0.04 and interpolate based on metalness.
     vec3 F0 = vec3(0.04);
-    F0 = mix(F0, texAlbedo, metalness);
+    F0 = mix(F0, texAlbedo, texMetalness);
 
     // Test 4 set lights
     vec3 lightPositions[1] = vec3[1]
@@ -118,15 +123,15 @@ void main()
         vec3 F = fresnelSchlick(max(dot(halfVec, viewDir), 0.0), F0);
 
          // Calculate geometry occlusion
-        float G = GeometrySmith(normal, viewDir, lightDir, roughness);
+        float G = GeometrySmith(normal, viewDir, lightDir, texRoughness);
          // Calculate normal distribution
-        float NDF = DistributionGGX(normal, halfVec, roughness);
+        float NDF = DistributionGGX(normal, halfVec, texRoughness);
 
         // Fresnel corrensponds to kS (the energy of light that gets reflected)
         vec3 kS = F;
         // Ratio of refraction (remaining after reflection)
         vec3 kD = vec3(1.0) - kS; 
-        kD *= 1.0 - metalness;
+        kD *= 1.0 - texMetalness;
 
         // Calculate Cook-Torrance BRDF
         vec3 numerator = NDF * G * F;

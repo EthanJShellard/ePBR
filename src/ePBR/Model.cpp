@@ -44,6 +44,24 @@ namespace ePBR
 		}
 	}
 
+	void Model::SetMaterial(int _index, std::shared_ptr<PBRMaterial> _newMat) 
+	{
+		if (m_materials.size() < _index + 1) 
+		{
+			m_materials.resize(_index + 1);
+		}
+		m_materials.at(_index) = _newMat;
+	}
+
+	void Model::SetMesh(int _index, std::shared_ptr<Mesh> _newMesh)
+	{
+		if (m_meshes.size() < _index + 1)
+		{
+			m_meshes.resize(_index + 1);
+		}
+		m_meshes.at(_index) = _newMesh;
+	}
+
 	void Model::Load(const std::string& _filename)
 	{
 		std::ifstream fin(_filename.c_str());

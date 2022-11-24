@@ -22,8 +22,8 @@ namespace ePBR
 		std::vector<std::shared_ptr<Mesh>> GetMeshes() { return m_meshes; }
 		std::vector<std::shared_ptr<PBRMaterial>> GetMaterials() { return m_materials; }
 
-		void SetMaterial(int _index, std::shared_ptr<PBRMaterial> _newMat) { m_materials.at(_index) = _newMat; }
-		void SetMesh(int _index, std::shared_ptr<Mesh> _newMesh) { m_meshes.at(_index) = _newMesh; }
+		void SetMaterial(int _index, std::shared_ptr<PBRMaterial> _newMat);
+		void SetMesh(int _index, std::shared_ptr<Mesh> _newMesh);
 
 		void Load(const std::string& _filename);
 		void Draw(glm::mat4 _modelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projMatrix, glm::vec3 _camPos);
