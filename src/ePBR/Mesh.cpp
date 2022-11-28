@@ -41,6 +41,8 @@ namespace ePBR
 			std::vector<glm::vec2> orderedUVData;
 			std::vector<glm::vec3> orderedPositionData;
 			std::vector<glm::vec3> orderedNormalData;
+			std::vector<glm::vec3> orderedTangentVectors;
+			std::vector <glm::vec3> orderedBitangentVectors;
 
 			std::string currentLine;
 
@@ -150,12 +152,48 @@ namespace ePBR
 					m_VAO->SetBuffer(normalBuffer, 1);
 				}
 
-
 				if (orderedUVData.size() > 0)
 				{
 					std::shared_ptr<VertexBuffer> texBuffer = std::make_shared<VertexBuffer>();
 					texBuffer->SetData(orderedUVData);
 					m_VAO->SetBuffer(texBuffer, 2);
+				}
+
+				if (orderedUVData.size() > 0 && orderedNormalData.size() > 0 && numVertices) 
+				{
+					orderedTangentVectors.resize(orderedNormalData.size());
+					orderedBitangentVectors.resize(orderedNormalData.size());
+
+					for (int i = 0; i < orderedPositionData.size(); i += 3)
+					{
+						glm::vec3 edge1 = orderedPositionData[i + 1] - orderedPositionData[i];
+						glm::vec3 edge2 = orderedPositionData[i + 2] - orderedPositionData[i];
+						glm::vec2 deltaUV1 = orderedUVData[i + 1] - orderedUVData[i];
+						glm::vec2 deltaUV2 = orderedUVData[i + 2] - orderedUVData[i];
+
+						float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+						orderedTangentVectors[i].x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+						orderedTangentVectors[i].y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+						orderedTangentVectors[i].z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+						orderedBitangentVectors[i].x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+						orderedBitangentVectors[i].y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+						orderedBitangentVectors[i].z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+
+						orderedTangentVectors[i + 1] = orderedTangentVectors[i];
+						orderedBitangentVectors[i + 1] = orderedBitangentVectors[i];
+
+						orderedTangentVectors[i + 2] = orderedTangentVectors[i];
+						orderedBitangentVectors[i + 2] = orderedBitangentVectors[i];
+					}
+
+					std::shared_ptr<VertexBuffer> tangentBuffer = std::make_shared<VertexBuffer>();
+					tangentBuffer->SetData(orderedTangentVectors);
+					m_VAO->SetBuffer(tangentBuffer, 3);
+
+					std::shared_ptr<VertexBuffer> bitangentBuffer = std::make_shared<VertexBuffer>();
+					bitangentBuffer->SetData(orderedBitangentVectors);
+					m_VAO->SetBuffer(bitangentBuffer, 4);
 				}
 			}
 		}

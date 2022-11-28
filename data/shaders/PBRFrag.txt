@@ -7,6 +7,7 @@
 in vec3 normalV;
 in vec3 positionV;
 in vec2 texCoordV;
+in mat3 TBN;
 
 // Uniforms
 uniform vec3 camPos;
@@ -76,8 +77,12 @@ float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 
 void main()
 {
-    vec3 normal = normalize(normalV);
-    //vec3 normal = vec3(texture(albedoMap, vec2(texCoordV.x, texCoordV.y)));
+    //vec3 normal = normalize(normalV);
+    // Use TBN to transform tangent space normals
+    vec3 normal = vec3(texture(albedoMap, vec2(texCoordV.x, texCoordV.y)));
+    normal = normal * 2.0 - 1.0;
+    normal = normalize(TBN * normal);
+
     vec3 viewDir = normalize(camPos - positionV);
 
     // Sample albedo
