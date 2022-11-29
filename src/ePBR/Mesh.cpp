@@ -166,12 +166,19 @@ namespace ePBR
 
 					for (int i = 0; i < orderedPositionData.size(); i += 3)
 					{
-						glm::vec3 edge1 = orderedPositionData[i + 1] - orderedPositionData[i];
-						glm::vec3 edge2 = orderedPositionData[i + 2] - orderedPositionData[i];
-						glm::vec2 deltaUV1 = orderedUVData[i + 1] - orderedUVData[i];
-						glm::vec2 deltaUV2 = orderedUVData[i + 2] - orderedUVData[i];
+						glm::vec3 edge1;
+						glm::vec3 edge2;
+						glm::vec2 deltaUV1;
+						glm::vec2 deltaUV2;
+						float f;
 
-						float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+						// Vertex 1
+						edge1 = orderedPositionData[i + 1] - orderedPositionData[i];
+						edge2 = orderedPositionData[i + 2] - orderedPositionData[i];
+						deltaUV1 = orderedUVData[i + 1] - orderedUVData[i];
+						deltaUV2 = orderedUVData[i + 2] - orderedUVData[i];
+
+						f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
 						orderedTangentVectors[i].x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
 						orderedTangentVectors[i].y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
@@ -180,11 +187,35 @@ namespace ePBR
 						orderedBitangentVectors[i].y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
 						orderedBitangentVectors[i].z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
 
-						orderedTangentVectors[i + 1] = orderedTangentVectors[i];
-						orderedBitangentVectors[i + 1] = orderedBitangentVectors[i];
+						// Vertex 2
+						edge1 = orderedPositionData[i] - orderedPositionData[i + 1];
+						edge2 = orderedPositionData[i + 2] - orderedPositionData[i + 1];
+						deltaUV1 = orderedUVData[i] - orderedUVData[i + 1];
+						deltaUV2 = orderedUVData[i + 2] - orderedUVData[i + 1];
 
-						orderedTangentVectors[i + 2] = orderedTangentVectors[i];
-						orderedBitangentVectors[i + 2] = orderedBitangentVectors[i];
+						f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+						orderedTangentVectors[i + 1].x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+						orderedTangentVectors[i + 1].y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+						orderedTangentVectors[i + 1].z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+						orderedBitangentVectors[i + 1].x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+						orderedBitangentVectors[i + 1].y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+						orderedBitangentVectors[i + 1].z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+
+						// Vertex 3
+						edge1 = orderedPositionData[i + 1] - orderedPositionData[i + 2];
+						edge2 = orderedPositionData[i] - orderedPositionData[i + 2];
+						deltaUV1 = orderedUVData[i + 1] - orderedUVData[i + 2];
+						deltaUV2 = orderedUVData[i] - orderedUVData[i + 2];
+
+						f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+						orderedTangentVectors[i + 2].x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+						orderedTangentVectors[i + 2].y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+						orderedTangentVectors[i + 2].z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+						orderedBitangentVectors[i + 2].x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+						orderedBitangentVectors[i + 2].y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+						orderedBitangentVectors[i + 2].z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
 					}
 
 					std::shared_ptr<VertexBuffer> tangentBuffer = std::make_shared<VertexBuffer>();

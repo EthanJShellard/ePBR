@@ -19,11 +19,11 @@ uniform float roughness;
 uniform float ambientOcclusion;
 
 // This is another input to allow us to access a texture
-uniform sampler2D albedoMap;
-uniform sampler2D normalMap;
-uniform sampler2D metalnessMap;
-uniform sampler2D roughnessMap;
-uniform sampler2D ambientOcclusionMap;
+layout(location = 0) uniform sampler2D albedoMap;
+layout(location = 1) uniform sampler2D normalMap;
+layout(location = 2) uniform sampler2D metalnessMap;
+layout(location = 3) uniform sampler2D roughnessMap;
+layout(location = 4) uniform sampler2D ambientOcclusionMap;
 
 // This is the output, it is the fragment's (pixel's) colour
 out vec4 fragColour;
@@ -77,18 +77,22 @@ float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 
 void main()
 {
-    //vec3 normal = normalize(normalV);
-    // Use TBN to transform tangent space normals
-    vec3 normal = vec3(texture(albedoMap, vec2(texCoordV.x, texCoordV.y)));
-    normal = normal * 2.0 - 1.0;
-    normal = normalize(TBN * normal);
+    
 
     vec3 viewDir = normalize(camPos - positionV);
 
     // Sample albedo
     vec3 texAlbedo = vec3(texture(albedoMap,vec2(texCoordV.x,1-texCoordV.y)));
+
+    //vec3 normal = normalize(normalV);
+    // Use TBN to transform tangent space normals
+    vec3 normal = vec3(texture(normalMap, vec2(texCoordV.x, texCoordV.y)));
+    normal = normal * 2.0 - 1.0;
+    normal = normalize(TBN * normal);
+
     // Sample metalness
     float texMetalness = texture(metalnessMap, vec2(texCoordV.x, texCoordV.y)).x;
+
     // Sample roughness
     float texRoughness = texture(roughnessMap, vec2(texCoordV.x, texCoordV.y)).x;
 

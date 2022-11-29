@@ -112,18 +112,23 @@ namespace ePBR
 		glUniform1f(m_roughnessLocation, m_roughness);
 
 		glActiveTexture(GL_TEXTURE0);
+		glUniform1i(m_albedoSamplerLocation, 0);
 		glBindTexture(GL_TEXTURE_2D, m_albedoTexture->GetID());
 
 		glActiveTexture(GL_TEXTURE1);
+		glUniform1i(m_normalMapSamplerLocation, 1);
 		glBindTexture(GL_TEXTURE_2D, m_normalMap->GetID());
 
 		glActiveTexture(GL_TEXTURE2);
+		glUniform1i(m_metalnessMapSamplerLocation, 2);
 		glBindTexture(GL_TEXTURE_2D, m_metalnessMap->GetID());
 
 		glActiveTexture(GL_TEXTURE3);
+		glUniform1i(m_roughnessMapSamplerLocation, 3);
 		glBindTexture(GL_TEXTURE_2D, m_roughnessMap->GetID());
 
 		glActiveTexture(GL_TEXTURE4);
+		glUniform1i(m_ambientOcclusionMapSamplerLocation, 4);
 		glBindTexture(GL_TEXTURE_2D, m_ambientOcclusionMap->GetID());
 	}
 }
