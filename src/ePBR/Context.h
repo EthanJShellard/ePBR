@@ -15,13 +15,17 @@ namespace ePBR
 		SDL_Renderer* m_SDL_Renderer;
 		SDL_GLContext m_SDL_GL_Context;
 
+		bool m_initialised;
+
 		void InitGL();
 		void InitSDL();
 		void InitSDL_GL();
 		void InitImGui();
 	public:
 		void Test(std::string _pwd);
+		void Init(SDL_Window* _window);
 
 		Context();
+		~Context();
 	};
 }

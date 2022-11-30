@@ -121,12 +121,30 @@ namespace ePBR
 		ImGui_ImplOpenGL3_Init(glslVersion);
 	}
 
-	void Context::Test(std::string _pwd) 
+	void Context::Init(SDL_Window* _window) 
 	{
-		InitSDL();
+		if (_window) 
+		{
+			m_window = _window;
+		}
+		else 
+		{
+			InitSDL();
+		}
+
 		InitSDL_GL();
 		InitGL();
 		InitImGui();
+
+		m_initialised = true;
+	}
+
+	void Context::Test(std::string _pwd) 
+	{
+		if (!m_initialised) 
+		{
+			throw std::runtime_error("Attempted to use uninitialised render context.");
+		}
 
 		//Handle window resizing
 		SDL_MaximizeWindow(m_window);
@@ -394,7 +412,18 @@ namespace ePBR
 		}
 
 		// If we get outside the main game loop, it means our user has requested we exit
+	}
 
+	Context::Context() :
+		m_SDL_Renderer(NULL),
+		m_window(NULL),
+		m_SDL_GL_Context(),
+		m_initialised(false)
+	{
+	}
+
+	Context::~Context() 
+	{
 		// Shut down GUI system
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplSDL2_Shutdown();
@@ -405,13 +434,5 @@ namespace ePBR
 		SDL_DestroyRenderer(m_SDL_Renderer);
 		SDL_DestroyWindow(m_window);
 		SDL_Quit();
-	}
-
-	Context::Context() :
-		m_SDL_Renderer(NULL),
-		m_window(NULL),
-		m_SDL_GL_Context()
-	{
-		
 	}
 }
