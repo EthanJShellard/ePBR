@@ -12,6 +12,7 @@
 namespace ePBR 
 {
 	class Model;
+	class Renderer;
 
 	// The scene contains objects, the camera and light
 	// It is responsible for coordinating these things
@@ -59,6 +60,6 @@ namespace ePBR
 		// Position of the camera
 		glm::vec3 m_camPos;
 
-
+		std::shared_ptr<Renderer> m_renderer;
 	};
 }

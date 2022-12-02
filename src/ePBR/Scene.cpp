@@ -7,6 +7,7 @@
 #include "PBRMaterial.h"
 #include "Model.h"
 #include "Shader.h"
+#include "Renderer.h"
 
 namespace ePBR 
 {
@@ -90,6 +91,9 @@ namespace ePBR
 			model->SetShader(shaderProgram);
 		}
 		
+		m_renderer = std::make_shared<Renderer>(1920, 1080);
+		m_renderer->SetFlagCullBackfaces(true);
+		m_renderer->SetModel(m_testModel);
 	}
 
 	Scene::~Scene()
@@ -112,7 +116,11 @@ namespace ePBR
 		// Draw that model, giving it the camera's position and projection
 		//m_model->Draw(m_viewMatrix, m_projMatrix, m_camPos);
 		// For testing just using identity for model matrix
-		m_testModel->Draw(glm::mat4(1), m_viewMatrix, m_projMatrix, m_camPos);
+		//m_testModel->Draw(glm::mat4(1), m_viewMatrix, m_projMatrix, m_camPos);
+		m_renderer->SetMatrices(glm::mat4(1), m_viewMatrix, m_projMatrix);
+		m_renderer->SetCamPos(m_camPos);
+
+		m_renderer->Draw();
 	}
 
 }
