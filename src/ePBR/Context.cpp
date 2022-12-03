@@ -57,11 +57,9 @@ namespace ePBR
 		// You can experiment with the numbers to see what they do
 		int winPosX = 10;
 		int winPosY = 10;
-		int winWidth = 1600;
-		int winHeight = 900;
 		m_window = SDL_CreateWindow("My Window!!!",  // The first parameter is the window title
 			winPosX, winPosY,
-			winWidth, winHeight,
+			m_windowWidth, m_windowHeight,
 			SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 		// The last parameter lets us specify a number of options
 		// Here, we tell SDL that we want the window to be shown and that it can be resized
@@ -126,6 +124,7 @@ namespace ePBR
 		if (_window) 
 		{
 			m_window = _window;
+			SDL_GetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
 		}
 		else 
 		{
@@ -146,12 +145,8 @@ namespace ePBR
 			throw std::runtime_error("Attempted to use uninitialised render context.");
 		}
 
-		//Handle window resizing
-		SDL_MaximizeWindow(m_window);
-		int width = 0;
-		int height = 0;
-		SDL_GetWindowSize(m_window, &width, &height);
-		glViewport(0, 0, width, height);
+		// Maximise window
+		MaximiseWindow();
 
 		// State to keep track of whether our window is expanded open or not
 		bool showLightingWindow = true;
@@ -160,11 +155,6 @@ namespace ePBR
 		// We will use this variable to store the time at our previous frame
 		// This function returns the number of milliseconds since SDL was initialised
 		unsigned int lastTime = SDL_GetTicks();
-
-
-		// Enable the depth test to make sure triangles in front are always in front no matter the order they are drawn
-		// When you do this, don't forget to clear the depth buffer at the start of each frame - otherwise you just get an empty screen!
-		glEnable(GL_DEPTH_TEST);
 
 		// Set up project working directory
 		_pwd = _pwd.substr(0, _pwd.find_last_of('\\') + 1);
@@ -414,11 +404,19 @@ namespace ePBR
 		// If we get outside the main game loop, it means our user has requested we exit
 	}
 
+	void Context::MaximiseWindow() 
+	{
+		SDL_MaximizeWindow(m_window);
+		SDL_GetWindowSize(m_window, &m_windowWidth, &m_windowHeight);
+	}
+
 	Context::Context() :
 		m_SDL_Renderer(NULL),
 		m_window(NULL),
 		m_SDL_GL_Context(),
-		m_initialised(false)
+		m_initialised(false),
+		m_windowWidth(1920),
+		m_windowHeight(1080)
 	{
 	}
 
