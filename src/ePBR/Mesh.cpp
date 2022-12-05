@@ -251,15 +251,50 @@ namespace ePBR
 			glm::vec3(w, w, -w), // Top right of nearest face
 			glm::vec3(-w, w, -w), // Top left of nearest face
 
-			// Tri 1 of farthest face
-			glm::vec3(w, -w, w), // Bottom right of farthest face
-			glm::vec3(-w, -w, w), // Bottom left of farthest face
-			glm::vec3(-w, w, w), // Top left of farthest face
+			// Tri 1 of farthest face (Did these from behind for no reason)
+			glm::vec3(w, -w, w), // Bottom right of farthest face (from behind)
+			glm::vec3(-w, -w, w), // Bottom left of farthest face (from behind)
+			glm::vec3(-w, w, w), // Top left of farthest face (from behind)
 			// Tri 2 of farthest face
-			glm::vec3(-w, w, w), // Top left of farthest face
-			glm::vec3(w, w, w), // Top right of farthest face
-			glm::vec3(w, -w, w) // Bottom right of farthest face
+			glm::vec3(-w, w, w), // Top left of farthest face (from behind)
+			glm::vec3(w, w, w), // Top right of farthest face (from behind)
+			glm::vec3(w, -w, w), // Bottom right of farthest face (from behind)
 			
+			// Tri 1 of right hand face
+			glm::vec3(w, w, -w), // Top left of right hand face
+			glm::vec3(w, -w, -w), // Bottom left of right hand face
+			glm::vec3(w, -w, w), // Bottom right of right hand face
+			// Tri 2 of right hand face
+			glm::vec3(w, -w, w), // Bottom right of right hand face
+			glm::vec3(w, w, w), // Top right of right hand face
+			glm::vec3(w, w, -w), // Top left of right hand face
+
+			// Tri 1 of left hand face
+			glm::vec3(-w, w, w), // Top left of left hand face
+			glm::vec3(-w, -w, w), // Bottom left of left hand face
+			glm::vec3(-w, -w, -w), // Bottom right of left hand face
+			// Tri 2 of left hand face
+			glm::vec3(-w, -w, -w), // Bottom right of left hand face
+			glm::vec3(-w, w, -w), // Top right of left hand face
+			glm::vec3(-w, w, w), // Top left of left hand face
+
+			// Tri 1 of top face
+			glm::vec3(-w, w, w), // Top left of top face
+			glm::vec3(-w, w, -w), // Bottom left of top face
+			glm::vec3(w, w, -w), // Bottom right of top face
+			// Tri 2 of top face
+			glm::vec3(w, w, -w), // Bottom right of top face
+			glm::vec3(w, w, w), // Top right of top face
+			glm::vec3(-w, w, w), // Top left of top face
+
+			// Tri 1 of bottom face
+			glm::vec3(w, -w, -w), // Top left of bottom face
+			glm::vec3(w, -w, w), // Bottom left of bottom face
+			glm::vec3(-w, -w, w), // Bottom right of bottom face
+			// Tri 2 of bottom face
+			glm::vec3(-w, -w, w), // Bottom right of bottom face
+			glm::vec3(-w, -w, -w), // Top right of bottom face
+			glm::vec3(w, -w, -w) // Top left of bottom face
 		};
 
 		std::vector<glm::vec2> orderedUVs = 
@@ -271,9 +306,52 @@ namespace ePBR
 			// Tri 2 of nearest face
 			glm::vec2(1, 1), // Bottom right of nearest face
 			glm::vec2(1, 0), // Top right of nearest face
-			glm::vec2(0, 0) // Top left of nearest face
+			glm::vec2(0, 0), // Top left of nearest face
 
-			// TODO: THIS NEXT
+			// Tri 1 of farthest face
+			glm::vec2(0, 1), // Bottom right of farthest face
+			glm::vec2(1, 1), // Bottom left of farthest face
+			glm::vec2(1, 0), // Top left of farthest face
+			// Tri 2 of farthest face
+			glm::vec2(1, 0), // Top left of farthest face
+			glm::vec2(0, 0), // Top right of farthest face
+			glm::vec2(0, 1), // Bottom right of farthest face
+
+			// Tri 1 of right hand face
+			glm::vec2(0, 0), // Top left of right hand face
+			glm::vec2(0, 1), // Bottom left of right hand face
+			glm::vec2(1, 1), // Bottom right of right hand face
+			// Tri 2 of right hand face
+			glm::vec2(1, 1), // Bottom right of right hand face
+			glm::vec2(1, 0), // Top right of right hand face
+			glm::vec2(0, 0), // Top left of right hand face
+
+			// Tri 1 of left hand face
+			glm::vec2(0, 0), // Top left of left hand face
+			glm::vec2(0, 1), // Bottom left of left hand face
+			glm::vec2(1, 1), // Bottom right of left hand face
+			// Tri 2 of left hand face
+			glm::vec2(1, 1), // Bottom right of left hand face
+			glm::vec2(1, 0), // Top right of left hand face
+			glm::vec2(0, 0), // Top left of left hand face
+
+			// Tri 1 of top face
+			glm::vec2(0, 0), // Top left of top face
+			glm::vec2(0, 1), // Bottom left of top face
+			glm::vec2(1, 1), // Bottom right of top face
+			// Tri 2 of top face
+			glm::vec2(1, 1), // Bottom right of top face
+			glm::vec2(1, 0), // Top right of top face
+			glm::vec2(0, 0), // Top left of top face
+
+			// Tri 1 of bottom face
+			glm::vec2(0, 0), // Top left of bottom face
+			glm::vec2(0, 1), // Bottom left of bottom face
+			glm::vec2(1, 1), // Bottom right of bottom face
+			// Tri 2 of bottom face
+			glm::vec2(1, 1), // Bottom right of bottom face
+			glm::vec2(1, 0), // Top right of bottom face
+			glm::vec2(0, 0) // Top left of bottom face
 		};
 
 		std::vector<glm::vec3> orderedNormals = 
@@ -285,11 +363,157 @@ namespace ePBR
 			// Tri 2 of nearest face
 			glm::vec3(0, 0, -1), // Bottom right of nearest face
 			glm::vec3(0, 0, -1), // Top right of nearest face
-			glm::vec3(0, 0, -1) // Top left of nearest face
+			glm::vec3(0, 0, -1), // Top left of nearest face
+
+			// Tri 1 of farthest face
+			glm::vec3(0, 0, 1), // Bottom right of farthest face
+			glm::vec3(0, 0, 1), // Bottom left of farthest face
+			glm::vec3(0, 0, 1), // Top left of farthest face
+			// Tri 2 of farthest face
+			glm::vec3(0, 0, 1), // Top left of farthest face
+			glm::vec3(0, 0, 1), // Top right of farthest face
+			glm::vec3(0, 0, 1), // Bottom right of farthest face
+
+			// Tri 1 of right hand face
+			glm::vec3(1, 0, 0), // Top left of right hand face
+			glm::vec3(1, 0, 0), // Bottom left of right hand face
+			glm::vec3(1, 0, 0), // Bottom right of right hand face
+			// Tri 2 of right hand face
+			glm::vec3(1, 0, 0), // Bottom right of right hand face
+			glm::vec3(1, 0, 0), // Top right of right hand face
+			glm::vec3(1, 0, 0), // Top left of right hand face
+
+			// Tri 1 of left hand face
+			glm::vec3(-1, 0, 0), // Top left of left hand face
+			glm::vec3(-1, 0, 0), // Bottom left of left hand face
+			glm::vec3(-1, 0, 0), // Bottom right of left hand face
+			// Tri 2 of left hand face
+			glm::vec3(-1, 0, 0), // Bottom right of left hand face
+			glm::vec3(-1, 0, 0), // Top right of left hand face
+			glm::vec3(-1, 0, 0), // Top left of left hand face
+
+			// Tri 1 of top face
+			glm::vec3(0, 1, 0), // Top left of top face
+			glm::vec3(0, 1, 0), // Bottom left of top face
+			glm::vec3(0, 1, 0), // Bottom right of top face
+			// Tri 2 of top face
+			glm::vec3(0, 1, 0), // Bottom right of top face
+			glm::vec3(0, 1, 0), // Top right of top face
+			glm::vec3(0, 1, 0), // Top left of top face
+
+			// Tri 1 of bottom face
+			glm::vec3(0, -1, 0), // Top left of bottom face
+			glm::vec3(0, -1, 0), // Bottom left of bottom face
+			glm::vec3(0, -1, 0), // Bottom right of bottom face
+			// Tri 2 of bottom face
+			glm::vec3(0, -1, 0), // Bottom right of bottom face
+			glm::vec3(0, -1, 0), // Top right of bottom face
+			glm::vec3(0, -1, 0) // Top left of bottom face
 		};
 
-		std::vector<glm::vec3> orderedTangentVectors;
-		std::vector <glm::vec3> orderedBitangentVectors;
+		// Generated tangent vectors
+		std::vector<glm::vec3> orderedTangentVectors =
+		{
+			glm::vec3(2, -0, -0),
+			glm::vec3(2, 0, 0),
+			glm::vec3(2, -0, -0),
+			glm::vec3(2, -0, -0),
+			glm::vec3(2, -0, 0),
+			glm::vec3(2, 0, 0),
+			glm::vec3(-2, 0, 0),
+			glm::vec3(-2, -0, -0),
+			glm::vec3(-2, 0, 0),
+			glm::vec3(-2, -0, -0),
+			glm::vec3(-2, 0, 0),
+			glm::vec3(-2, 0, 0),
+			glm::vec3(-0, -0, 2),
+			glm::vec3(0, 0, 2),
+			glm::vec3(-0, -0, 2),
+			glm::vec3(-0, -0, 2),
+			glm::vec3(0, -0, 2),
+			glm::vec3(0, 0, 2),
+			glm::vec3(-0, -0, -2),
+			glm::vec3(0, 0, -2),
+			glm::vec3(-0, -0, -2),
+			glm::vec3(-0, -0, -2),
+			glm::vec3(0, -0, -2),
+			glm::vec3(0, 0, -2),
+			glm::vec3(2, -0, -0),
+			glm::vec3(2, 0, 0),
+			glm::vec3(2, -0, -0),
+			glm::vec3(2, -0, -0),
+			glm::vec3(2, 0, -0),
+			glm::vec3(2, 0, 0),
+			glm::vec3(-2, -0, -0),
+			glm::vec3(-2, 0, 0),
+			glm::vec3(-2, -0, 0),
+			glm::vec3(-2, -0, -0),
+			glm::vec3(-2, 0, 0),
+			glm::vec3(-2, 0, 0)
+		};
+
+		// Generated bitangent vectors
+		std::vector <glm::vec3> orderedBitangentVectors =
+		{
+			glm::vec3(-0, -2, -0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(-0, -2, -0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(-0, -2, -0),
+			glm::vec3(-0, -2, -0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(-0, -2, -0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(-0, -2, 0),
+			glm::vec3(-0, -2, -0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(-0, -2, -0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(-0, -2, 0),
+			glm::vec3(0, -2, -0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(-0, -2, -0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(0, -2, 0),
+			glm::vec3(-0, -0, -2),
+			glm::vec3(0, 0, -2),
+			glm::vec3(0, 0, -2),
+			glm::vec3(-0, -0, -2),
+			glm::vec3(0, 0, -2),
+			glm::vec3(0, 0, -2),
+			glm::vec3(0, -0, 2),
+			glm::vec3(-0, 0, 2),
+			glm::vec3(0, 0, 2),
+			glm::vec3(-0, -0, 2),
+			glm::vec3(0, 0, 2),
+			glm::vec3(0, 0, 2)
+		};
+
+		m_VAO->SetVertCount(orderedPositions.size());
+
+		std::shared_ptr<VertexBuffer> positionsBuffer = std::make_shared<VertexBuffer>();
+		positionsBuffer->SetData(orderedPositions);
+		m_VAO->SetBuffer(positionsBuffer, 0);
+
+		std::shared_ptr<VertexBuffer> normalsBuffer = std::make_shared<VertexBuffer>();
+		normalsBuffer->SetData(orderedNormals);
+		m_VAO->SetBuffer(normalsBuffer, 1);
+
+		std::shared_ptr<VertexBuffer> uvBuffer = std::make_shared<VertexBuffer>();
+		uvBuffer->SetData(orderedUVs);
+		m_VAO->SetBuffer(uvBuffer, 2);
+
+		std::shared_ptr<VertexBuffer> tangentBuffer = std::make_shared<VertexBuffer>();
+		tangentBuffer->SetData(orderedTangentVectors);
+		m_VAO->SetBuffer(tangentBuffer, 3);
+
+		std::shared_ptr<VertexBuffer> bitangentBuffer = std::make_shared<VertexBuffer>();
+		bitangentBuffer->SetData(orderedBitangentVectors);
+		m_VAO->SetBuffer(bitangentBuffer, 4);
 	}
 
 	void Mesh::Draw()

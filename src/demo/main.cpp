@@ -37,8 +37,9 @@ int main(int argc, char* argv[])
 
 		// The mesh is the geometry for the object
 		std::shared_ptr<ePBR::Mesh> modelMesh = std::make_shared<ePBR::Mesh>();
+		modelMesh->SetAsCube(1.0f);
 		//// Load from OBJ file. This must have triangulated geometry
-		modelMesh->LoadOBJ(pwd + "data\\models\\sphere\\triangulated.obj");
+		//modelMesh->LoadOBJ(pwd + "data\\models\\sphere\\triangulated.obj");
 
 		// Set up model
 		std::shared_ptr<ePBR::Model> testModel = std::make_shared<ePBR::Model>();
