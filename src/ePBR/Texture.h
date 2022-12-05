@@ -13,6 +13,7 @@ namespace ePBR
 
 	public:
 		void Load(std::string _fileName);
+		void LoadHDR(std::string _fileName);
 		const GLuint GetID() const;
 
 		Texture(std::string _fileName);

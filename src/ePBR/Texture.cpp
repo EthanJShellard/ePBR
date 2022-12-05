@@ -34,7 +34,7 @@ namespace ePBR
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		// By default, OpenGL mag filter is linear
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		// By default, OpenGL min filter will use mipmaps
 		// We therefore either need to tell it to use linear or generate a mipmap
@@ -57,8 +57,63 @@ namespace ePBR
 		}
 		
 
-		//glGenerateMipmap(GL_TEXTURE_2D);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		free(data);
+	}
 
+	void Texture::LoadHDR(std::string _fileName)
+	{
+		// If we've already loaded a texture, unload it first
+		if (m_ID)
+		{
+			glDeleteTextures(1, &m_ID);
+		}
+
+		// Load SDL surface
+		int width, height, components;
+		stbi_set_flip_vertically_on_load(1);
+		float* data = stbi_loadf(_fileName.c_str(), &width, &height, &components, 0);
+
+		if (!data) // Check it worked
+		{
+			throw std::runtime_error("WARNING: could not load texture: " + _fileName);
+		}
+
+		// Create OpenGL texture
+		glGenTextures(1, &m_ID);
+
+		glBindTexture(GL_TEXTURE_2D, m_ID);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		// By default, OpenGL mag filter is linear
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		// By default, OpenGL min filter will use mipmaps
+		// We therefore either need to tell it to use linear or generate a mipmap
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+		// SDL loads images in BGR order
+		// Will need to handle different formats!!
+		if (components == 4)
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, data);
+		}
+		else if (components == 1)
+		{
+			// Metalness texture not loading data... stb_image's fault?
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, width, height, 0, GL_RED, GL_FLOAT, data);
+		}
+		else if (components == 3)
+		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
+		}
+
+
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		free(data);
 	}
 
