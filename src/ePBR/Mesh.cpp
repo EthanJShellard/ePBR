@@ -234,6 +234,64 @@ namespace ePBR
 		}
 	}
 
+	void Mesh::SetAsCube(float _hw) 
+	{
+		// Makes typing and reading easier. Still represents half-width...
+		float w = _hw;
+
+		// Default winding order is counter clockwise
+		std::vector<glm::vec3> orderedPositions = 
+		{ 
+			// Tri 1 of nearest face
+			glm::vec3(-w, w, -w), // Top left of nearest face
+			glm::vec3(-w, -w, -w), // Bottom left of nearest face
+			glm::vec3(w, -w, -w), // Bottom right of nearest face
+			// Tri 2 of nearest face
+			glm::vec3(w, -w, -w), // Bottom right of nearest face
+			glm::vec3(w, w, -w), // Top right of nearest face
+			glm::vec3(-w, w, -w), // Top left of nearest face
+
+			// Tri 1 of farthest face
+			glm::vec3(w, -w, w), // Bottom right of farthest face
+			glm::vec3(-w, -w, w), // Bottom left of farthest face
+			glm::vec3(-w, w, w), // Top left of farthest face
+			// Tri 2 of farthest face
+			glm::vec3(-w, w, w), // Top left of farthest face
+			glm::vec3(w, w, w), // Top right of farthest face
+			glm::vec3(w, -w, w) // Bottom right of farthest face
+			
+		};
+
+		std::vector<glm::vec2> orderedUVs = 
+		{
+			// Tri 1 of nearest face
+			glm::vec2(0, 0), // Top left of nearest face
+			glm::vec2(0, 1), // Bottom left of nearest face
+			glm::vec2(1, 1), // Bottom right of nearest face
+			// Tri 2 of nearest face
+			glm::vec2(1, 1), // Bottom right of nearest face
+			glm::vec2(1, 0), // Top right of nearest face
+			glm::vec2(0, 0) // Top left of nearest face
+
+			// TODO: THIS NEXT
+		};
+
+		std::vector<glm::vec3> orderedNormals = 
+		{
+			// Tri 1 of nearest face
+			glm::vec3(0, 0, -1), // Top left of nearest face
+			glm::vec3(0, 0, -1), // Bottom left of nearest face
+			glm::vec3(0, 0, -1), // Bottom right of nearest face
+			// Tri 2 of nearest face
+			glm::vec3(0, 0, -1), // Bottom right of nearest face
+			glm::vec3(0, 0, -1), // Top right of nearest face
+			glm::vec3(0, 0, -1) // Top left of nearest face
+		};
+
+		std::vector<glm::vec3> orderedTangentVectors;
+		std::vector <glm::vec3> orderedBitangentVectors;
+	}
+
 	void Mesh::Draw()
 	{
 		// Activate the VAO
