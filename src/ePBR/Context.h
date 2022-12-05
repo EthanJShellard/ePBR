@@ -25,7 +25,6 @@ namespace ePBR
 		void InitSDL_GL();
 		void InitImGui();
 	public:
-		void Test(std::string _pwd);
 		void Init(SDL_Window* _window);
 
 		/// @brief Maximise the window. Updates window width and height variables which can be used to update Renderers and RenderTextures
@@ -33,6 +32,8 @@ namespace ePBR
 
 		int GetWindowWidth() const { return m_windowWidth; }
 		int GetWindowHeight() const { return m_windowHeight; }
+
+		void DisplayFrame();
 
 		Context();
 		~Context();

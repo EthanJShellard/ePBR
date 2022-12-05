@@ -60,6 +60,7 @@ namespace ePBR
 
 		void SetClearColour(const glm::vec4& _newClearColour) { m_clearColour = _newClearColour; }
 		glm::vec4 GetClearColour() const { return m_clearColour; }
+		void Clear();
 
 		void SetFlagDepthTest(bool _doDepthTest) { m_depthTest = _doDepthTest; }
 		bool GetFlagDepthTest() const { return m_depthTest; }
