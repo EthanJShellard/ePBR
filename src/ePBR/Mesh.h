@@ -1,6 +1,6 @@
 
-#ifndef __MESH__
-#define __MESH__
+#ifndef EPBR_MESH
+#define EPBR_MESH
 
 #include "VertexArray.h"
 
@@ -34,4 +34,4 @@ namespace ePBR
 		std::shared_ptr<VertexArray> m_VAO;
 	};
 }
-#endif
+#endif // EPBR_MESH

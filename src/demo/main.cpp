@@ -1,9 +1,4 @@
-#include <ePBR/Context.h>
-#include <ePBR/Renderer.h>
-#include <ePBR/Model.h>
-#include <ePBR/Shader.h>
-#include <ePBR/PBRMaterial.h>
-#include <ePBR/Mesh.h>
+#include <ePBR/ePBR.h>
 
 #include <glm/ext.hpp>
 

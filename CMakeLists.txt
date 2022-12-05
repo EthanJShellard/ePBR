@@ -53,6 +53,7 @@ add_library(ePBR
     src/ePBR/Renderer.cpp
     src/ePBR/RenderTexture.h
     src/ePBR/RenderTexture.cpp
+    src/ePBR/ePBR.h
 )
 
 add_executable(demo

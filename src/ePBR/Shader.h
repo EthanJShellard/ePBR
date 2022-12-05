@@ -1,3 +1,6 @@
+#ifndef EPBR_SHADER
+#define EPBR_SHADER
+
 #include <GL/glew.h>
 #include <string>
 
@@ -27,3 +30,5 @@ namespace ePBR
 		bool m_dirty;
 	};
 }
+
+#endif // EPBR_SHADER

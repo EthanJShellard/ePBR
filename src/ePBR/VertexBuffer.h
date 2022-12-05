@@ -1,3 +1,6 @@
+#ifndef EPBR_VERTEX_BUFFER
+#define EPBR_VERTEX_BUFFER
+
 #include <vector>
 
 #include <GL/glew.h>
@@ -36,3 +39,5 @@ namespace ePBR
 		bool m_dirty; //Used to specify whether data is yet to be uploaded to GPU
 	};
 }
+
+#endif // EPBR_VERTEX_BUFFER

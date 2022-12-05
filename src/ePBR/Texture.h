@@ -21,4 +21,4 @@ namespace ePBR
 	};
 }
 
-#endif EPBR_TEXTURE
+#endif // EPBR_TEXTURE

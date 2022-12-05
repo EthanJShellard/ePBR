@@ -1,3 +1,6 @@
+#ifndef EPBR_RENDERER
+#define EPBR_RENDERER
+
 #include <memory>
 #include <glm/glm.hpp>
 
@@ -72,3 +75,5 @@ namespace ePBR
 		bool GetFlagBlend() const { return m_blend; }
 	};
 }
+
+#endif // EPBR_RENDERER

@@ -1,3 +1,6 @@
+#ifndef EPBR_RENDER_TEXTURE
+#define EPBR_RENDER_TEXTURE
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
@@ -34,3 +37,5 @@ namespace ePBR
 		~RenderTexture();
 	};
 }
+
+#endif // EPBR_RENDER_TEXTURE

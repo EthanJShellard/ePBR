@@ -1,6 +1,6 @@
 
-#ifndef __MATERIAL__
-#define __MATERIAL__
+#ifndef EPBR_MATERIAL
+#define EPBR_MATERIAL
 
 #include <string>
 #include <GLM/glm.hpp>
@@ -68,7 +68,4 @@ protected:
 
 };
 
-
-
-
-#endif
+#endif // EPBR_MATERIAL

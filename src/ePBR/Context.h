@@ -1,3 +1,6 @@
+#ifndef EPBR_CONTEXT
+#define EPBR_CONTEXT
+
 #include <string>
 
 #include <SDL2/SDL.h>
@@ -39,3 +42,5 @@ namespace ePBR
 		~Context();
 	};
 }
+
+#endif // EPBR_CONTEXT
