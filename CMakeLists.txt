@@ -53,6 +53,8 @@ add_library(ePBR
     src/ePBR/Renderer.cpp
     src/ePBR/RenderTexture.h
     src/ePBR/RenderTexture.cpp
+    src/ePBR/CubeMap.h
+    src/ePBR/CubeMap.cpp
     src/ePBR/ePBR.h
 )
 

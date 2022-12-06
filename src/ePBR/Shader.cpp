@@ -97,8 +97,8 @@ namespace ePBR
 			}
 
 			GLint success = 0;
-			glAttachShader(m_id, m_fragID);
 			glAttachShader(m_id, m_vertID);
+			glAttachShader(m_id, m_fragID);
 
 			// Perform the link and check for failure
 			glLinkProgram(m_id);
@@ -107,12 +107,12 @@ namespace ePBR
 			if (!success)
 			{
 				GLint maxLength = 0;
-				glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &maxLength);
+				glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &maxLength);
 
 				if (maxLength)
 				{
 					std::vector<GLchar> errorLog(maxLength);
-					glGetShaderInfoLog(m_id, maxLength, &maxLength, &errorLog[0]);
+					glGetProgramInfoLog(m_id, maxLength, &maxLength, &errorLog[0]);
 					std::cerr << &errorLog.at(0) << std::endl;
 					throw std::exception();
 				}

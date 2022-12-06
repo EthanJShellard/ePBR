@@ -9,13 +9,12 @@ int main(int argc, char* argv[])
 {
 	try 
 	{
-		ePBR::Context context;
-		context.Init(nullptr);
-		context.MaximiseWindow();
-		//context.Test(argv[0]);
-
 		std::string pwd(argv[0]);
 		pwd = pwd.substr(0, pwd.find_last_of('\\') + 1);
+
+		ePBR::Context context(pwd);
+		context.Init(nullptr);
+		context.MaximiseWindow();
 
 		// Set up matrices
 		glm::mat4 viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3.5f));
@@ -25,13 +24,14 @@ int main(int argc, char* argv[])
 		// Set up renderer
 		ePBR::Renderer renderer(context.GetWindowWidth(), context.GetWindowHeight());
 		renderer.SetFlagCullBackfaces(true);
+		renderer.SetFlagDepthTest(true);
 		glm::vec3 camPos(0);
 
 		// Test PBR Material
 		std::shared_ptr<ePBR::PBRMaterial> material = std::make_shared<ePBR::PBRMaterial>();
-		//material->SetAlbedoTexture(pwd + "data\\textures\\rustediron2\\rustediron2_basecolor.png");
+		material->SetAlbedoTexture(pwd + "data\\textures\\rustediron2\\rustediron2_basecolor.png");
 		// CUBE TEST
-		material->SetAlbedoTexture(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
+		//material->SetAlbedoTexture(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
 
 		material->SetMetalnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_metallic.png");
 		material->SetNormalMap(pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
@@ -49,11 +49,14 @@ int main(int argc, char* argv[])
 		testModel->SetMesh(0, modelMesh);
 		testModel->SetMaterial(0, material);
 
-		//std::shared_ptr<ePBR::Shader> shader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBRVert.txt", pwd + "data\\shaders\\PBRFrag.txt");
-		std::shared_ptr<ePBR::Shader> shader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\environment_mapping\\EquirectangularToCubemap.vert", pwd + "data\\shaders\\environment_mapping\\EquirectangularToCubemap.frag");
+		std::shared_ptr<ePBR::Shader> shader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBRVert.txt", pwd + "data\\shaders\\PBRFrag.txt");
+		//std::shared_ptr<ePBR::Shader> shader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\environment_mapping\\EquirectangularToCubemap.vert", pwd + "data\\shaders\\environment_mapping\\EquirectangularToCubemap.frag");
 		GLuint projLocation = glGetUniformLocation(shader->GetID(), "projection");
 		GLuint viewLocation = glGetUniformLocation(shader->GetID(), "view");
 
+		// Get equirectangular map
+		std::shared_ptr<ePBR::Texture> equirectangularMap = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
+		std::shared_ptr<ePBR::CubeMap> cubeMap = context.GenerateCubemap(equirectangularMap);
 
 		for (auto model : testModel->GetMaterials())
 		{
@@ -67,7 +70,7 @@ int main(int argc, char* argv[])
 		// Timing
 		unsigned int lastTime = SDL_GetTicks();
 
-
+		// Render cubemap faces into framebuffers textures
 
 
 		bool running = true;
@@ -148,12 +151,9 @@ int main(int argc, char* argv[])
 			renderer.SetMatrices(modelMatrix, viewMatrix, projectionMatrix);
 			renderer.SetCamPos(camPos);
 			renderer.SetModel(testModel);
-
-			// FOR CUBE TEST
-			glUniformMatrix4fv(projLocation, 1, false, glm::value_ptr(projectionMatrix));
-			glUniformMatrix4fv(viewLocation, 1, false, glm::value_ptr(viewMatrix));
-
 			renderer.Draw();
+
+			context.RenderSkyBox(cubeMap, viewMatrix, projectionMatrix);
 
 			context.DisplayFrame();	
 		}

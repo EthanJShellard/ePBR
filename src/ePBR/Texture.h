@@ -16,7 +16,7 @@ namespace ePBR
 		void LoadHDR(std::string _fileName);
 		const GLuint GetID() const;
 
-		Texture(std::string _fileName);
+		Texture(std::string _fileName, bool _isHDR = false);
 		Texture();
 		~Texture();
 	};

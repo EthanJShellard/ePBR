@@ -29,8 +29,8 @@ namespace ePBR
 		m_camPos(0.0f),
 		m_clearColour(0.0f, 0.0f, 0.0f, 1.0f),
 		m_depthTest(true),
-		m_backfaceCull(false),
-		m_blend(false),
+		m_backfaceCull(true),
+		m_blend(true),
 		m_width(_renderTarget->GetWidth()),
 		m_height(_renderTarget->GetHeight())
 	{
@@ -55,12 +55,12 @@ namespace ePBR
 		}
 		if (m_backfaceCull) 
 		{
-
 			glEnable(GL_CULL_FACE);
 		}
 		if (m_depthTest) 
 		{
 			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
 		}
 
 		// Draw model if we have one!

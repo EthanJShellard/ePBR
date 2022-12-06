@@ -2,12 +2,16 @@
 
 // Glew linked statically
 #include <GL/glew.h>
+#include <glm/ext.hpp>
 
 #include <imgui/imgui_impl_sdl.h>
 #include <imgui/imgui_impl_opengl3.h>
 
 #include "PBRMaterial.h"
 #include "Model.h"
+#include "CubeMap.h"
+#include "Mesh.h"
+#include "Shader.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -146,13 +150,62 @@ namespace ePBR
 		SDL_GL_SwapWindow(m_window);
 	}
 
-	Context::Context() :
+	std::shared_ptr<CubeMap> Context::GenerateCubemap(std::shared_ptr<Texture> _equirectangularMap) 
+	{
+		if (!m_cubeMapGenerationShader) 
+		{
+			m_cubeMapGenerationShader = std::make_shared<Shader>(
+				m_pwd + "data\\shaders\\environment_mapping\\EquirectangularToCubemap.vert",
+				m_pwd + "data\\shaders\\environment_mapping\\EquirectangularToCubemap.frag"
+				);
+		}
+
+		return std::shared_ptr<CubeMap>(new CubeMap(_equirectangularMap, m_cubeMapGenerationShader));
+	}
+
+	void Context::RenderSkyBox(std::shared_ptr<CubeMap> _environmentMap, const glm::mat4& _viewMat, const glm::mat4& _projectionMat)
+	{
+		if (!m_unitCube) 
+		{
+			m_unitCube = std::make_shared<Mesh>();
+			m_unitCube->SetAsCube(0.5f);
+		}
+		if (!m_skyboxShader) 
+		{
+			m_skyboxShader = std::make_shared<Shader>(m_pwd + "data/shaders/environment_mapping/Skybox.vert", m_pwd + "data/shaders/environment_mapping/Skybox.frag");
+			m_skyboxProjectionPos = glGetUniformLocation(m_skyboxShader->GetID(), "projection");
+			m_skyboxViewPos = glGetUniformLocation(m_skyboxShader->GetID(), "view");
+			m_skyboxEnvironmentMapLocation = glGetUniformLocation(m_skyboxShader->GetID(), "environmentMap");
+		}
+	
+		glUseProgram(m_skyboxShader->GetID());
+
+		// Env map
+		glUniform1i(m_skyboxEnvironmentMapLocation, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, _environmentMap->GetID());
+
+		// Matrices
+		glUniformMatrix4fv(m_skyboxProjectionPos, 1, false, glm::value_ptr(_projectionMat));
+		glUniformMatrix4fv(m_skyboxViewPos, 1, false, glm::value_ptr(_viewMat));
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_EQUAL);
+
+		m_unitCube->Draw();
+	}
+
+	Context::Context(std::string _projectWorkingDirectory) :
 		m_SDL_Renderer(NULL),
 		m_window(NULL),
 		m_SDL_GL_Context(),
 		m_initialised(false),
 		m_windowWidth(1920),
-		m_windowHeight(1080)
+		m_windowHeight(1080),
+		m_pwd(_projectWorkingDirectory),
+		m_skyboxEnvironmentMapLocation(0),
+		m_skyboxProjectionPos(0),
+		m_skyboxViewPos(0)
 	{
 	}
 

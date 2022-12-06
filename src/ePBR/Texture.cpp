@@ -122,9 +122,9 @@ namespace ePBR
 		return m_ID;
 	}
 
-	Texture::Texture(std::string _fileName) 
+	Texture::Texture(std::string _fileName, bool _isHDR) 
 	{
-		Load(_fileName);
+		_isHDR ? LoadHDR(_fileName) : Load(_fileName);
 	}
 
 	Texture::Texture() : 

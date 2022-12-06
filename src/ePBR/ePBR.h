@@ -12,5 +12,6 @@
 #include "Texture.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
+#include "CubeMap.h"
 
 #endif // EPBR_SINGLE_INCLUDE
