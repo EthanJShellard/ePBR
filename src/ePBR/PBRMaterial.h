@@ -30,11 +30,11 @@ namespace ePBR
 		float GetRoughness() { return m_roughness; }
 		float GetMetalness() { return m_metalness; }
 
-		bool SetAlbedoTexture(std::string _fileName) { m_albedoTexture->Load(_fileName); return m_albedoTexture != NULL; }
-		bool SetNormalMap(std::string _fileName) { m_normalMap->Load(_fileName); return m_normalMap != NULL; }
-		bool SetMetalnessMap(std::string _fileName) { m_metalnessMap->Load(_fileName); return m_metalnessMap != NULL; }
-		bool SetRoughnessMap(std::string _fileName) { m_roughnessMap->Load(_fileName); return m_roughnessMap != NULL; }
-		bool SetAmbientOcclusionMap(std::string _fileName) { m_ambientOcclusionMap->Load(_fileName); return m_ambientOcclusionMap != NULL; }
+		bool SetAlbedoTexture(std::string _fileName, bool _isHDR = false)       { _isHDR ? m_albedoTexture->LoadHDR(_fileName) : m_albedoTexture->Load(_fileName); return m_albedoTexture != NULL; }
+		bool SetNormalMap(std::string _fileName, bool _isHDR = false)           { _isHDR ? m_normalMap->LoadHDR(_fileName) : m_normalMap->Load(_fileName); return m_normalMap != NULL; }
+		bool SetMetalnessMap(std::string _fileName, bool _isHDR = false)        { _isHDR ? m_metalnessMap->LoadHDR(_fileName) : m_metalnessMap->Load(_fileName); return m_metalnessMap != NULL; }
+		bool SetRoughnessMap(std::string _fileName, bool _isHDR = false)        { _isHDR ? m_roughnessMap->LoadHDR(_fileName) : m_roughnessMap->Load(_fileName); return m_roughnessMap != NULL; }
+		bool SetAmbientOcclusionMap(std::string _fileName, bool _isHDR = false) { _isHDR ? m_ambientOcclusionMap->LoadHDR(_fileName) : m_ambientOcclusionMap->Load(_fileName); return m_ambientOcclusionMap != NULL; }
 
 		void SetAlbedoTexture(std::shared_ptr<Texture> _newTex) { m_albedoTexture = _newTex; }
 		void SetNormalMap(std::shared_ptr<Texture> _newTex) { m_normalMap = _newTex; }
