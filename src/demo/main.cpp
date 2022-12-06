@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 		// Set up matrices
 		glm::mat4 viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3.5f));
 		glm::mat4 projectionMatrix = glm::perspective(45.0f, (float)context.GetWindowWidth() / context.GetWindowHeight(), 0.1f, 100.0f);
-		glm::mat4 modelMatrix(1.0f);
+		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0,0.5,0));
 
 		// Set up renderer
 		ePBR::Renderer renderer(context.GetWindowWidth(), context.GetWindowHeight());
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
 		// The mesh is the geometry for the object
 		std::shared_ptr<ePBR::Mesh> modelMesh = std::make_shared<ePBR::Mesh>();
-		modelMesh->SetAsCube(1.0f);
+		modelMesh->SetAsCube(0.5f);
 		//// Load from OBJ file. This must have triangulated geometry
 		//modelMesh->LoadOBJ(pwd + "data\\models\\sphere\\triangulated.obj");
 
@@ -127,6 +127,8 @@ int main(int argc, char* argv[])
 
 			cameraAngleX += cmdRotateDown ? -1.0f * deltaTime : 0.0f;
 			cameraAngleX += cmdRotateUp ? 1.0f * deltaTime : 0.0f;
+
+			modelMatrix = glm::rotate(modelMatrix, deltaTime * 1, glm::vec3(0.5, 0, 0.5));
 
 			// Construct view matrix
 			viewMatrix = glm::rotate(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5f, -2.0f)), cameraAngleX, glm::vec3(1, 0, 0)), cameraAngleY, glm::vec3(0, 1, 0));
