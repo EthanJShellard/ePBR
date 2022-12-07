@@ -49,19 +49,9 @@ int main(int argc, char* argv[])
 		testModel->SetMesh(0, modelMesh);
 		testModel->SetMaterial(0, material);
 
-		std::shared_ptr<ePBR::Shader> shader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBRVert.txt", pwd + "data\\shaders\\PBRFrag.txt");
-		//std::shared_ptr<ePBR::Shader> shader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\environment_mapping\\EquirectangularToCubemap.vert", pwd + "data\\shaders\\environment_mapping\\EquirectangularToCubemap.frag");
-		GLuint projLocation = glGetUniformLocation(shader->GetID(), "projection");
-		GLuint viewLocation = glGetUniformLocation(shader->GetID(), "view");
-
-		// Get equirectangular map
+		// Get equirectangular map and generate cubemap
 		std::shared_ptr<ePBR::Texture> equirectangularMap = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
 		std::shared_ptr<ePBR::CubeMap> cubeMap = context.GenerateCubemap(equirectangularMap);
-
-		for (auto model : testModel->GetMaterials())
-		{
-			model->SetShader(shader);
-		}
 
 		// Controls
 		bool cmdRotateDown(false), cmdRotateUp(false), cmdRotateLeft(false), cmdRotateRight(false);
@@ -69,9 +59,6 @@ int main(int argc, char* argv[])
 
 		// Timing
 		unsigned int lastTime = SDL_GetTicks();
-
-		// Render cubemap faces into framebuffers textures
-
 
 		bool running = true;
 		while (running) 

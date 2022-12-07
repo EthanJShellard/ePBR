@@ -18,7 +18,7 @@ namespace ePBR
 		m_renderBufferID(0),
 		m_mapID(0)
 	{
-		const int width = 512;
+		const int width = 2048;
 
 		glGenFramebuffers(1, &m_frameBufferID);
 		glGenRenderbuffers(1, &m_renderBufferID);
@@ -26,7 +26,7 @@ namespace ePBR
 		glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferID);
 		glBindRenderbuffer(GL_RENDERBUFFER, m_renderBufferID);
 
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, width);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderBufferID);
 
 		// Generate textures
@@ -56,20 +56,25 @@ namespace ePBR
 			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,0.0f,-1.0f), glm::vec3(0.0f,-1.0f,0.0f))
 		};
 
+		GLuint mapLocation = glGetUniformLocation(_equirectangularToCubemapShader->GetID(), "equirectangularMap");
+		GLuint projLocation = glGetUniformLocation(_equirectangularToCubemapShader->GetID(), "projection");
+
 		glUseProgram(_equirectangularToCubemapShader->GetID());
-		glUniform1i(glGetUniformLocation(_equirectangularMap->GetID(), "equirectangularMap"), 0);
-		glUniformMatrix4fv(glGetUniformLocation(_equirectangularMap->GetID(), "projectionMat"), 1, false, glm::value_ptr(projectionMat));
+		glUniform1i(mapLocation, 0);
+		glUniformMatrix4fv(projLocation, 1, false, glm::value_ptr(projectionMat));
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, _equirectangularMap->GetID());
 
 		glViewport(0,0, width, width);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferID);
+		//glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferID);
 
-		GLuint viewMatLoc = glGetUniformLocation(_equirectangularMap->GetID(), "projectionMat");
+		GLuint viewMatLoc = glGetUniformLocation(_equirectangularToCubemapShader->GetID(), "view");
 
 		// Create cube mesh
 		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
 		mesh->SetAsCube(0.5f);
+
+		glFrontFace(GL_CW);
 
 		for (unsigned int i = 0; i < 6; i++) 
 		{
@@ -79,6 +84,8 @@ namespace ePBR
 
 			mesh->Draw();
 		}
+
+		glFrontFace(GL_CCW);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
