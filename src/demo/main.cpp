@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 		// Set up matrices
 		glm::mat4 viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -3.5f));
 		glm::mat4 projectionMatrix = glm::perspective(45.0f, (float)context.GetWindowWidth() / context.GetWindowHeight(), 0.1f, 100.0f);
-		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0,0.5,0));
+		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0,0,0));
 
 		// Set up renderer
 		ePBR::Renderer renderer(context.GetWindowWidth(), context.GetWindowHeight());
@@ -30,8 +30,6 @@ int main(int argc, char* argv[])
 		// Test PBR Material
 		std::shared_ptr<ePBR::PBRMaterial> material = std::make_shared<ePBR::PBRMaterial>();
 		material->SetAlbedoTexture(pwd + "data\\textures\\rustediron2\\rustediron2_basecolor.png");
-		// CUBE TEST
-		//material->SetAlbedoTexture(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
 
 		material->SetMetalnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_metallic.png");
 		material->SetNormalMap(pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
@@ -40,9 +38,8 @@ int main(int argc, char* argv[])
 
 		// The mesh is the geometry for the object
 		std::shared_ptr<ePBR::Mesh> modelMesh = std::make_shared<ePBR::Mesh>();
-		modelMesh->SetAsCube(0.5f);
 		//// Load from OBJ file. This must have triangulated geometry
-		//modelMesh->LoadOBJ(pwd + "data\\models\\sphere\\triangulated.obj");
+		modelMesh->LoadOBJ(pwd + "data\\models\\sphere\\triangulated.obj");
 
 		// Set up model
 		std::shared_ptr<ePBR::Model> testModel = std::make_shared<ePBR::Model>();
@@ -52,6 +49,7 @@ int main(int argc, char* argv[])
 		// Get equirectangular map and generate cubemap
 		std::shared_ptr<ePBR::Texture> equirectangularMap = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
 		std::shared_ptr<ePBR::CubeMap> cubeMap = context.GenerateCubemap(equirectangularMap);
+		std::shared_ptr<ePBR::CubeMap> convolutedCubeMap = context.ConvoluteCubeMap(cubeMap);
 
 		// Controls
 		bool cmdRotateDown(false), cmdRotateUp(false), cmdRotateLeft(false), cmdRotateRight(false);
@@ -127,7 +125,7 @@ int main(int argc, char* argv[])
 			cameraAngleX += cmdRotateDown ? -1.0f * deltaTime : 0.0f;
 			cameraAngleX += cmdRotateUp ? 1.0f * deltaTime : 0.0f;
 
-			modelMatrix = glm::rotate(modelMatrix, deltaTime * 1, glm::vec3(0.5, 0, 0.5));
+			modelMatrix = glm::rotate(modelMatrix, deltaTime * 1, glm::vec3(0, 1.0f, 0));
 
 			// Construct view matrix
 			viewMatrix = glm::rotate(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5f, -2.0f)), cameraAngleX, glm::vec3(1, 0, 0)), cameraAngleY, glm::vec3(0, 1, 0));
@@ -140,7 +138,7 @@ int main(int argc, char* argv[])
 			renderer.SetModel(testModel);
 			renderer.Draw();
 
-			context.RenderSkyBox(cubeMap, viewMatrix, projectionMatrix);
+			context.RenderSkyBox(convolutedCubeMap, viewMatrix, projectionMatrix);
 
 			context.DisplayFrame();	
 		}

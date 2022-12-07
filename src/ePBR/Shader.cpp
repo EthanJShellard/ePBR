@@ -18,6 +18,13 @@ namespace ePBR
 		glDeleteShader(m_vertID);
 
 		fileRead.open(_path);
+
+		if (!fileRead.is_open()) 
+		{
+			std::cerr << "Failed to open vertex shader at " << _path << std::endl;
+			throw std::exception();
+		}
+
 		strStream << fileRead.rdbuf();
 		stringSrc = strStream.str();
 		const char* src = stringSrc.c_str();
@@ -55,6 +62,13 @@ namespace ePBR
 		glDeleteShader(m_fragID);
 
 		fileRead.open(_path);
+
+		if (!fileRead.is_open())
+		{
+			std::cerr << "Failed to open fragment shader at " << _path << std::endl;
+			throw std::exception();
+		}
+
 		strStream << fileRead.rdbuf();
 		stringSrc = strStream.str();
 		const char* src = stringSrc.c_str();

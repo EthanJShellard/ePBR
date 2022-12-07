@@ -37,6 +37,12 @@ namespace ePBR
 		unsigned int m_skyboxProjectionPos;
 		unsigned int m_skyboxEnvironmentMapLocation;
 
+		// Convolution
+		std::shared_ptr<Shader> m_convolutionShader;
+		unsigned int m_convolutionViewPos;
+		unsigned int m_convolutionProjectionPos;
+		unsigned int m_convolutionEnvironementMapPos;
+
 		int m_windowWidth;
 		int m_windowHeight;
 
@@ -59,6 +65,7 @@ namespace ePBR
 
 		std::shared_ptr<CubeMap> GenerateCubemap(std::shared_ptr<Texture> _equirectangularMap);
 		void RenderSkyBox(std::shared_ptr<CubeMap> _environmentMap, const glm::mat4& _viewMat, const glm::mat4& _projectionMat);
+		std::shared_ptr<CubeMap> ConvoluteCubeMap(std::shared_ptr<CubeMap> _cubeMap);
 
 		Context(std::string _projectWorkingDirectory);
 		~Context();

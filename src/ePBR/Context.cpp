@@ -16,6 +16,9 @@
 #include <iostream>
 #include <stdexcept>
 
+const int DEFAULT_CUBEMAP_WIDTH = 2048;
+const int DEFAULT_CONVOLUTED_CUBEMAP_WIDTH = 64;
+
 namespace ePBR 
 {
 	void Context::InitGL() 
@@ -160,7 +163,7 @@ namespace ePBR
 				);
 		}
 
-		return std::shared_ptr<CubeMap>(new CubeMap(_equirectangularMap, m_cubeMapGenerationShader));
+		return std::shared_ptr<CubeMap>(new CubeMap(DEFAULT_CUBEMAP_WIDTH, _equirectangularMap, m_cubeMapGenerationShader));
 	}
 
 	void Context::RenderSkyBox(std::shared_ptr<CubeMap> _environmentMap, const glm::mat4& _viewMat, const glm::mat4& _projectionMat)
@@ -195,6 +198,60 @@ namespace ePBR
 		m_unitCube->Draw();
 	}
 
+	std::shared_ptr<CubeMap> Context::ConvoluteCubeMap(std::shared_ptr<CubeMap> _cubeMap) 
+	{
+		if (!m_convolutionShader) 
+		{
+			m_convolutionShader = std::make_shared<Shader>(m_pwd + "data/shaders/environment_mapping/ConvoluteCubemap.vert", m_pwd + "data/shaders/environment_mapping/ConvoluteCubemap.frag");
+			m_convolutionViewPos = glGetUniformLocation(m_convolutionShader->GetID(), "view");
+			m_convolutionProjectionPos = glGetUniformLocation(m_convolutionShader->GetID(), "projection");
+			m_convolutionEnvironementMapPos = glGetUniformLocation(m_convolutionShader->GetID(), "environmentMap");
+		}
+
+		std::shared_ptr<CubeMap> conv(new CubeMap(DEFAULT_CONVOLUTED_CUBEMAP_WIDTH));
+
+		Mesh mesh;
+		mesh.SetAsCube(0.5f);
+
+		glm::mat4 projectionMat = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+		glm::mat4 viewMatrices[] =
+		{
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(1.0f,0.0f,0.0f), glm::vec3(0.0f,-1.0f,0.0f)),
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-1.0f,0.0f,0.0f), glm::vec3(0.0f,-1.0f,0.0f)),
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,1.0f,0.0f), glm::vec3(0.0f,0.0f,1.0f)),
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,-1.0f,0.0f), glm::vec3(0.0f,0.0f,-1.0f)),
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,0.0f,1.0f), glm::vec3(0.0f,-1.0f,0.0f)),
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,0.0f,-1.0f), glm::vec3(0.0f,-1.0f,0.0f))
+		};
+
+		glUseProgram(m_convolutionShader->GetID());
+		glUniform1i(m_convolutionEnvironementMapPos, 0);
+		glUniformMatrix4fv(m_convolutionProjectionPos, 1, false, glm::value_ptr(projectionMat));
+
+		glActiveTexture(0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, _cubeMap->GetID());
+
+		glViewport(0,0, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH);
+		glBindFramebuffer(GL_FRAMEBUFFER, conv->GetID());
+
+		glFrontFace(GL_CW);
+
+		for (int i = 0; i < 6; i++) 
+		{
+			glUniformMatrix4fv(m_convolutionViewPos, 1, false, glm::value_ptr(viewMatrices[i]));
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, conv->GetID(), 0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			mesh.Draw();
+		}
+
+		glFrontFace(GL_CCW);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		return conv;
+	}
+
 	Context::Context(std::string _projectWorkingDirectory) :
 		m_SDL_Renderer(NULL),
 		m_window(NULL),
@@ -205,7 +262,10 @@ namespace ePBR
 		m_pwd(_projectWorkingDirectory),
 		m_skyboxEnvironmentMapLocation(0),
 		m_skyboxProjectionPos(0),
-		m_skyboxViewPos(0)
+		m_skyboxViewPos(0),
+		m_convolutionViewPos(0),
+		m_convolutionProjectionPos(0),
+		m_convolutionEnvironementMapPos(0)
 	{
 	}
 

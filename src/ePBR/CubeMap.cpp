@@ -13,12 +13,11 @@ namespace ePBR
 		return m_mapID;
 	}
 
-	CubeMap::CubeMap(std::shared_ptr<Texture> _equirectangularMap, std::shared_ptr<Shader> _equirectangularToCubemapShader) :
+	CubeMap::CubeMap(int _width) :
 		m_frameBufferID(0),
 		m_renderBufferID(0),
 		m_mapID(0)
 	{
-		const int width = 2048;
 
 		glGenFramebuffers(1, &m_frameBufferID);
 		glGenRenderbuffers(1, &m_renderBufferID);
@@ -26,7 +25,41 @@ namespace ePBR
 		glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferID);
 		glBindRenderbuffer(GL_RENDERBUFFER, m_renderBufferID);
 
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, width);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, _width, _width);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderBufferID);
+
+		// Generate textures
+		glGenTextures(1, &m_mapID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_mapID);
+
+		for (unsigned int i = 0; i < 6; i++)
+		{
+			// Presuming HDR for now
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, _width, _width, 0, GL_RGB, GL_FLOAT, nullptr);
+		}
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	}
+
+	CubeMap::CubeMap(int _width, std::shared_ptr<Texture> _equirectangularMap, std::shared_ptr<Shader> _equirectangularToCubemapShader) :
+		m_frameBufferID(0),
+		m_renderBufferID(0),
+		m_mapID(0)
+	{
+
+		glGenFramebuffers(1, &m_frameBufferID);
+		glGenRenderbuffers(1, &m_renderBufferID);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferID);
+		glBindRenderbuffer(GL_RENDERBUFFER, m_renderBufferID);
+
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, _width, _width);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderBufferID);
 
 		// Generate textures
@@ -36,7 +69,7 @@ namespace ePBR
 		for (unsigned int i = 0; i < 6; i++) 
 		{
 			// Presuming HDR for now
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, width, width, 0, GL_RGB, GL_FLOAT, nullptr);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, _width, _width, 0, GL_RGB, GL_FLOAT, nullptr);
 		}
 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -65,14 +98,14 @@ namespace ePBR
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, _equirectangularMap->GetID());
 
-		glViewport(0,0, width, width);
+		glViewport(0,0, _width, _width);
 		//glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferID);
 
 		GLuint viewMatLoc = glGetUniformLocation(_equirectangularToCubemapShader->GetID(), "view");
 
 		// Create cube mesh
-		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
-		mesh->SetAsCube(0.5f);
+		Mesh mesh;
+		mesh.SetAsCube(0.5f);
 
 		glFrontFace(GL_CW);
 
@@ -82,7 +115,7 @@ namespace ePBR
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_mapID, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			mesh->Draw();
+			mesh.Draw();
 		}
 
 		glFrontFace(GL_CCW);
