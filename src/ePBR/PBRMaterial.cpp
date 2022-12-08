@@ -67,7 +67,7 @@ namespace ePBR
 		m_metalnessMapSamplerLocation = glGetUniformLocation(id, "metalnessMap");
 		m_roughnessMapSamplerLocation = glGetUniformLocation(id, "roughnessMap");
 		m_ambientOcclusionMapSamplerLocation = glGetUniformLocation(id, "ambientOcclusionMap");
-		m_irradianceMapSamplerLocation = glGetUniformLocation(id, "environmentMap");
+		m_irradianceMapSamplerLocation = glGetUniformLocation(id, "irradianceMap");
 
 		return true;
 	}
@@ -139,7 +139,7 @@ namespace ePBR
 		{
 			glActiveTexture(GL_TEXTURE5);
 			glUniform1i(m_irradianceMapSamplerLocation, 5);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, m_irradianceMap->GetID());
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_irradianceMap->GetMapID());
 		}
 	}
 }

@@ -186,7 +186,7 @@ namespace ePBR
 		// Env map
 		glUniform1i(m_skyboxEnvironmentMapLocation, 0);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, _environmentMap->GetID());
+		glBindTexture(GL_TEXTURE_CUBE_MAP, _environmentMap->GetMapID());
 
 		// Matrices
 		glUniformMatrix4fv(m_skyboxProjectionPos, 1, false, glm::value_ptr(_projectionMat));
@@ -229,17 +229,18 @@ namespace ePBR
 		glUniformMatrix4fv(m_convolutionProjectionPos, 1, false, glm::value_ptr(projectionMat));
 
 		glActiveTexture(0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, _cubeMap->GetID());
+		glBindTexture(GL_TEXTURE_CUBE_MAP, _cubeMap->GetMapID());
 
 		glViewport(0,0, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH);
-		glBindFramebuffer(GL_FRAMEBUFFER, conv->GetID());
+		glBindFramebuffer(GL_FRAMEBUFFER, conv->GetFramebufferID());
+		glBindRenderbuffer(GL_RENDERBUFFER, conv->GetRenderbufferID());
 
 		glFrontFace(GL_CW);
 
 		for (int i = 0; i < 6; i++) 
 		{
 			glUniformMatrix4fv(m_convolutionViewPos, 1, false, glm::value_ptr(viewMatrices[i]));
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, conv->GetID(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, conv->GetMapID(), 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			mesh.Draw();
@@ -247,7 +248,9 @@ namespace ePBR
 
 		glFrontFace(GL_CCW);
 
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 		return conv;
 	}

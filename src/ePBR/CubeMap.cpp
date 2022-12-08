@@ -8,9 +8,19 @@
 
 namespace ePBR 
 {
-	GLuint CubeMap::GetID() 
+	GLuint CubeMap::GetMapID() 
 	{
 		return m_mapID;
+	}
+
+	GLuint CubeMap::GetFramebufferID() 
+	{
+		return m_frameBufferID;
+	}
+
+	GLuint CubeMap::GetRenderbufferID() 
+	{
+		return m_renderBufferID;
 	}
 
 	CubeMap::CubeMap(int _width) :
@@ -44,6 +54,10 @@ namespace ePBR
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	}
 
@@ -121,6 +135,8 @@ namespace ePBR
 		glFrontFace(GL_CCW);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	}
 
 	CubeMap::~CubeMap() 
