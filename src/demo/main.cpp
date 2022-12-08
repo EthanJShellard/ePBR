@@ -36,6 +36,13 @@ int main(int argc, char* argv[])
 		material->SetRoughnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
 		material->LoadShaders(pwd + "data\\shaders\\PBRVert.txt", pwd + "data\\shaders\\PBRFrag.txt");
 
+		// Get equirectangular map and generate cubemap
+		std::shared_ptr<ePBR::Texture> equirectangularMap = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
+		std::shared_ptr<ePBR::CubeMap> cubeMap = context.GenerateCubemap(equirectangularMap);
+		std::shared_ptr<ePBR::CubeMap> convolutedCubeMap = context.ConvoluteCubeMap(cubeMap);
+
+		material->SetEnvironmentMap(convolutedCubeMap);
+
 		// The mesh is the geometry for the object
 		std::shared_ptr<ePBR::Mesh> modelMesh = std::make_shared<ePBR::Mesh>();
 		//// Load from OBJ file. This must have triangulated geometry
@@ -45,11 +52,6 @@ int main(int argc, char* argv[])
 		std::shared_ptr<ePBR::Model> testModel = std::make_shared<ePBR::Model>();
 		testModel->SetMesh(0, modelMesh);
 		testModel->SetMaterial(0, material);
-
-		// Get equirectangular map and generate cubemap
-		std::shared_ptr<ePBR::Texture> equirectangularMap = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
-		std::shared_ptr<ePBR::CubeMap> cubeMap = context.GenerateCubemap(equirectangularMap);
-		std::shared_ptr<ePBR::CubeMap> convolutedCubeMap = context.ConvoluteCubeMap(cubeMap);
 
 		// Controls
 		bool cmdRotateDown(false), cmdRotateUp(false), cmdRotateLeft(false), cmdRotateRight(false);
@@ -87,6 +89,9 @@ int main(int argc, char* argv[])
 						break;
 					case SDLK_RIGHT:
 						cmdRotateRight = true;
+						break;
+					case SDLK_SPACE:
+						material->LoadShaders(pwd + "data\\shaders\\PBRVert.txt", pwd + "data\\shaders\\PBRFrag.txt");
 						break;
 					}
 					break;
@@ -138,7 +143,7 @@ int main(int argc, char* argv[])
 			renderer.SetModel(testModel);
 			renderer.Draw();
 
-			context.RenderSkyBox(convolutedCubeMap, viewMatrix, projectionMatrix);
+			context.RenderSkyBox(cubeMap, viewMatrix, projectionMatrix);
 
 			context.DisplayFrame();	
 		}

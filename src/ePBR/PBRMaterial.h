@@ -13,6 +13,7 @@ namespace ePBR
 {
 	// namepsaced forward declarations
 	class Shader;
+	class CubeMap;
 
 	class PBRMaterial
 	{
@@ -41,6 +42,7 @@ namespace ePBR
 		void SetMetalnessMap(std::shared_ptr<Texture> _newTex) { m_metalnessMap = _newTex; }
 		void SetRoughnessMap(std::shared_ptr<Texture> _newTex) { m_roughnessMap = _newTex; }
 		void SetAmbientOcclusionMap(std::shared_ptr<Texture> _newTex) { m_ambientOcclusionMap = _newTex; }
+		void SetEnvironmentMap(std::shared_ptr<CubeMap> _newMap) { m_irradianceMap = _newMap; }
 
 		void Apply(glm::mat4 _modelMatrix, glm::mat4 _invModelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projMatrix, glm::vec3 _camPos);
 
@@ -64,6 +66,7 @@ namespace ePBR
 		GLuint m_metalnessMapSamplerLocation;
 		GLuint m_roughnessMapSamplerLocation;
 		GLuint m_ambientOcclusionMapSamplerLocation;
+		GLuint m_irradianceMapSamplerLocation;
 
 		glm::vec3 m_albedo;
 		float m_roughness;
@@ -75,6 +78,7 @@ namespace ePBR
 		std::shared_ptr<Texture> m_metalnessMap;
 		std::shared_ptr<Texture> m_roughnessMap;
 		std::shared_ptr<Texture> m_ambientOcclusionMap;
+		std::shared_ptr<CubeMap> m_irradianceMap;
 	};
 }
 

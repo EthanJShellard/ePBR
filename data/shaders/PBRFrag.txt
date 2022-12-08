@@ -24,6 +24,7 @@ layout(location = 1) uniform sampler2D normalMap;
 layout(location = 2) uniform sampler2D metalnessMap;
 layout(location = 3) uniform sampler2D roughnessMap;
 layout(location = 4) uniform sampler2D ambientOcclusionMap;
+layout(location = 5) uniform samplerCube irradianceMap;
 
 // This is the output, it is the fragment's (pixel's) colour
 out vec4 fragColour;
@@ -35,6 +36,13 @@ const float PI = 3.14159265359;
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+// Fresnel schlick but with injected roughness. To be used when sampling an irradiance map as we will have no one halfway vector.
+// Uses technique described by Sebastien Lagarde.
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 // Test DistributionGGX
@@ -153,7 +161,14 @@ void main()
     }
 
     // Fake ambient
-    vec3 ambient = vec3(0.001) * texAlbedo/* * ao*/;
+    //vec3 ambient = vec3(0.001) * texAlbedo/* * ao*/;
+    // Separate diffuse and specular component of irradiance map
+    vec3 kS = fresnelSchlickRoughness(max(dot(normal, viewDir), 0.0), F0, texRoughness);
+    vec3 kD = 1.0 - kS;
+    vec3 irradiance = texture(irradianceMap, normal).rgb;
+    vec3 diffuse = irradiance * texAlbedo;
+    vec3 ambient = (kD * diffuse); //* ao;
+
     // Final lit colour
     vec3 colour = ambient + Lo;
 

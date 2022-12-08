@@ -20,7 +20,7 @@ void main()
     up = normalize(cross(normal, right));
 
     float sampleDelta = 0.025;
-    float numSamples = 0.0;
+    int numSamples = 0;
 
     for (float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta)
     {

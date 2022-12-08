@@ -1,5 +1,6 @@
 #include "PBRMaterial.h"
 #include "Shader.h"
+#include "CubeMap.h"
 
 #include <fstream>
 #include <iostream>
@@ -24,6 +25,7 @@ namespace ePBR
 		m_metalnessMapSamplerLocation(0),
 		m_roughnessMapSamplerLocation(0),
 		m_normalMapSamplerLocation(0),
+		m_irradianceMapSamplerLocation(0),
 		m_shaderProgram(std::make_shared<Shader>()),
 		m_albedoTexture(std::make_shared<Texture>()),
 		m_normalMap(std::make_shared<Texture>()),
@@ -65,6 +67,7 @@ namespace ePBR
 		m_metalnessMapSamplerLocation = glGetUniformLocation(id, "metalnessMap");
 		m_roughnessMapSamplerLocation = glGetUniformLocation(id, "roughnessMap");
 		m_ambientOcclusionMapSamplerLocation = glGetUniformLocation(id, "ambientOcclusionMap");
+		m_irradianceMapSamplerLocation = glGetUniformLocation(id, "environmentMap");
 
 		return true;
 	}
@@ -93,6 +96,7 @@ namespace ePBR
 		m_metalnessMapSamplerLocation = glGetUniformLocation(id, "metalnessMap");
 		m_roughnessMapSamplerLocation = glGetUniformLocation(id, "roughnessMap");
 		m_ambientOcclusionMapSamplerLocation = glGetUniformLocation(id, "ambientOcclusionMap");
+		m_irradianceMapSamplerLocation = glGetUniformLocation(id, "irradianceMap");
 	}
 
 	void PBRMaterial::Apply(glm::mat4 _modelMatrix, glm::mat4 _invModelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projMatrix, glm::vec3 _camPos) 
@@ -130,5 +134,12 @@ namespace ePBR
 		glActiveTexture(GL_TEXTURE4);
 		glUniform1i(m_ambientOcclusionMapSamplerLocation, 4);
 		glBindTexture(GL_TEXTURE_2D, m_ambientOcclusionMap->GetID());
+
+		if (m_irradianceMap) 
+		{
+			glActiveTexture(GL_TEXTURE5);
+			glUniform1i(m_irradianceMapSamplerLocation, 5);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_irradianceMap->GetID());
+		}
 	}
 }
