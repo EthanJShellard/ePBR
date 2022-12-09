@@ -43,6 +43,16 @@ namespace ePBR
 		unsigned int m_convolutionProjectionPos;
 		unsigned int m_convolutionEnvironementMapPos;
 
+		// Prefiltering
+		std::shared_ptr<Shader> m_prefilteringShader;
+		unsigned int m_prefilterEnvironmentMapPos;
+		unsigned int m_prefilterProjectionPos;
+		unsigned int m_prefilterRoughnessPos;
+		unsigned int m_prefilterViewPos;
+
+		// BRDF Lookup
+		std::shared_ptr<Texture> m_BRDFLUT;
+
 		int m_windowWidth;
 		int m_windowHeight;
 
@@ -65,7 +75,9 @@ namespace ePBR
 
 		std::shared_ptr<CubeMap> GenerateCubemap(std::shared_ptr<Texture> _equirectangularMap);
 		void RenderSkyBox(std::shared_ptr<CubeMap> _environmentMap, const glm::mat4& _viewMat, const glm::mat4& _projectionMat);
-		std::shared_ptr<CubeMap> ConvoluteCubeMap(std::shared_ptr<CubeMap> _cubeMap);
+		std::shared_ptr<CubeMap> GenerateDiffuseIrradianceMap(std::shared_ptr<CubeMap> _cubeMap);
+		std::shared_ptr<CubeMap> GeneratePrefilterIrradianceMap(std::shared_ptr<CubeMap> _cubeMap);
+		std::shared_ptr<Texture> GetBRDFLookupTexture();
 
 		Context(std::string _projectWorkingDirectory);
 		~Context();

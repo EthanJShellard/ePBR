@@ -4,8 +4,8 @@
 
 // These are the per-fragment inputs
 // They must match with the outputs of the vertex shader
-in vec3 normalV;
 in vec3 positionV;
+in vec3 normalV;
 in vec2 texCoordV;
 in mat3 TBN;
 

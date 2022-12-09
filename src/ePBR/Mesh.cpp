@@ -516,6 +516,133 @@ namespace ePBR
 		m_VAO->SetBuffer(bitangentBuffer, 4);
 	}
 
+	void Mesh::SetAsQuad(float _w, float _h) 
+	{
+		float w = _w;
+		float h = _h;
+
+		std::vector<glm::vec3> orderedPositions =
+		{
+			// tri 1
+			glm::vec3(w, -h, 0), // Bottom right
+			glm::vec3(-w, -h, 0), // Bottom left
+			glm::vec3(-w, h, 0), // Top left
+
+			// tri 2
+			glm::vec3(-w, h, 0), // Top left
+			glm::vec3(w, h, 0), // Top right
+			glm::vec3(w, -h, 0) // Bottom right
+		};
+
+		std::vector<glm::vec3> orderedNormals = 
+		{
+			// tri 1
+			glm::vec3(0, 0, -1), // Bottom right
+			glm::vec3(0, 0, -1), // Bottom left
+			glm::vec3(0, 0, -1), // Top left
+
+			// tri 2
+			glm::vec3(0, 0, -1), // Top left
+			glm::vec3(0, 0, -1), // Top right
+			glm::vec3(0, 0, -1) // Bottom right
+		};
+
+		std::vector<glm::vec2> orderedUVs = 
+		{
+			// tri 1
+			glm::vec2(1, 1), // Bottom right
+			glm::vec2(0, 1), // Bottom left
+			glm::vec2(0, 0), // Top left
+					
+			// tri 2
+			glm::vec2(0, 0), // Top left
+			glm::vec2(1, 0), // Top right
+			glm::vec2(1, 1) // Bottom right
+		};
+
+		std::vector<glm::vec3> orderedTangentVectors;
+		std::vector<glm::vec3> orderedBitangentVectors;
+
+		orderedTangentVectors.resize(orderedNormals.size());
+		orderedBitangentVectors.resize(orderedNormals.size());
+
+		for (int i = 0; i < orderedPositions.size(); i += 3)
+		{
+			glm::vec3 edge1;
+			glm::vec3 edge2;
+			glm::vec2 deltaUV1;
+			glm::vec2 deltaUV2;
+			float f;
+
+			// Vertex 1
+			edge1 = orderedPositions[i + 1] - orderedPositions[i];
+			edge2 = orderedPositions[i + 2] - orderedPositions[i];
+			deltaUV1 = orderedUVs[i + 1] - orderedUVs[i];
+			deltaUV2 = orderedUVs[i + 2] - orderedUVs[i];
+
+			f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+			orderedTangentVectors[i].x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+			orderedTangentVectors[i].y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+			orderedTangentVectors[i].z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+			orderedBitangentVectors[i].x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+			orderedBitangentVectors[i].y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+			orderedBitangentVectors[i].z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+
+			// Vertex 2
+			edge1 = orderedPositions[i] - orderedPositions[i + 1];
+			edge2 = orderedPositions[i + 2] - orderedPositions[i + 1];
+			deltaUV1 = orderedUVs[i] - orderedUVs[i + 1];
+			deltaUV2 = orderedUVs[i + 2] - orderedUVs[i + 1];
+
+			f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+			orderedTangentVectors[i + 1].x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+			orderedTangentVectors[i + 1].y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+			orderedTangentVectors[i + 1].z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+			orderedBitangentVectors[i + 1].x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+			orderedBitangentVectors[i + 1].y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+			orderedBitangentVectors[i + 1].z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+
+			// Vertex 3
+			edge1 = orderedPositions[i + 1] - orderedPositions[i + 2];
+			edge2 = orderedPositions[i] - orderedPositions[i + 2];
+			deltaUV1 = orderedUVs[i + 1] - orderedUVs[i + 2];
+			deltaUV2 = orderedUVs[i] - orderedUVs[i + 2];
+
+			f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+			orderedTangentVectors[i + 2].x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+			orderedTangentVectors[i + 2].y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+			orderedTangentVectors[i + 2].z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+			orderedBitangentVectors[i + 2].x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+			orderedBitangentVectors[i + 2].y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+			orderedBitangentVectors[i + 2].z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+		}
+
+		m_VAO->SetVertCount(orderedPositions.size());
+
+		std::shared_ptr<VertexBuffer> positionsBuffer = std::make_shared<VertexBuffer>();
+		positionsBuffer->SetData(orderedPositions);
+		m_VAO->SetBuffer(positionsBuffer, 0);
+
+		std::shared_ptr<VertexBuffer> normalsBuffer = std::make_shared<VertexBuffer>();
+		normalsBuffer->SetData(orderedNormals);
+		m_VAO->SetBuffer(normalsBuffer, 1);
+
+		std::shared_ptr<VertexBuffer> uvBuffer = std::make_shared<VertexBuffer>();
+		uvBuffer->SetData(orderedUVs);
+		m_VAO->SetBuffer(uvBuffer, 2);
+
+		std::shared_ptr<VertexBuffer> tangentBuffer = std::make_shared<VertexBuffer>();
+		tangentBuffer->SetData(orderedTangentVectors);
+		m_VAO->SetBuffer(tangentBuffer, 3);
+
+		std::shared_ptr<VertexBuffer> bitangentBuffer = std::make_shared<VertexBuffer>();
+		bitangentBuffer->SetData(orderedBitangentVectors);
+		m_VAO->SetBuffer(bitangentBuffer, 4);
+	}
+
 	void Mesh::Draw()
 	{
 		// Activate the VAO

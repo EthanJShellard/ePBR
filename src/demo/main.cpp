@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 
 		// Set up renderer
 		ePBR::Renderer renderer(context.GetWindowWidth(), context.GetWindowHeight());
-		renderer.SetFlagCullBackfaces(true);
+		renderer.SetFlagCullBackfaces(false);
 		renderer.SetFlagDepthTest(true);
 		glm::vec3 camPos(0);
 
@@ -39,14 +39,18 @@ int main(int argc, char* argv[])
 		// Get equirectangular map and generate cubemap
 		std::shared_ptr<ePBR::Texture> equirectangularMap = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
 		std::shared_ptr<ePBR::CubeMap> cubeMap = context.GenerateCubemap(equirectangularMap);
-		std::shared_ptr<ePBR::CubeMap> convolutedCubeMap = context.ConvoluteCubeMap(cubeMap);
+		std::shared_ptr<ePBR::CubeMap> convolutedCubeMap = context.GenerateDiffuseIrradianceMap(cubeMap);
+		std::shared_ptr<ePBR::CubeMap> prefilterEnvMap = context.GeneratePrefilterIrradianceMap(cubeMap);
+		std::shared_ptr<ePBR::Texture> brdfLUT = context.GetBRDFLookupTexture();
 
 		material->SetEnvironmentMap(convolutedCubeMap);
 
 		// The mesh is the geometry for the object
 		std::shared_ptr<ePBR::Mesh> modelMesh = std::make_shared<ePBR::Mesh>();
 		//// Load from OBJ file. This must have triangulated geometry
-		modelMesh->LoadOBJ(pwd + "data\\models\\sphere\\triangulated.obj");
+		//modelMesh->LoadOBJ(pwd + "data\\models\\sphere\\triangulated.obj");
+		modelMesh->SetAsQuad(0.5f, 0.5f);
+		material->SetAlbedoTexture(brdfLUT);
 
 		// Set up model
 		std::shared_ptr<ePBR::Model> testModel = std::make_shared<ePBR::Model>();

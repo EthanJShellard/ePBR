@@ -24,6 +24,7 @@ namespace ePBR
 		void LoadOBJ(std::string _filename);
 
 		void SetAsCube(float _halfWidth);
+		void SetAsQuad(float _halfWidth, float _halfHeight);
 
 		void SetVertexArray(std::shared_ptr<VertexArray> _newVAO) { m_VAO = _newVAO; };
 

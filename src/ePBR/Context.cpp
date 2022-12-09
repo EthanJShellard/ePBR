@@ -18,6 +18,8 @@
 
 const int DEFAULT_CUBEMAP_WIDTH = 2048;
 const int DEFAULT_CONVOLUTED_CUBEMAP_WIDTH = 64;
+const int DEFAULT_PREFILTER_CUBEMAP_WIDTH = 256;
+const int DEFAULT_BRDF_LOOK_UP_TEXTURE_WIDTH = 512;
 
 namespace ePBR 
 {
@@ -40,6 +42,9 @@ namespace ePBR
 		std::cout << "INFO: OpenGL Renderer: " << glGetString(GL_RENDERER) << std::endl;
 		std::cout << "INFO: OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 		std::cout << "INFO: OpenGL Shading Language Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+
+		// Defaults
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	}
 
 	void Context::InitSDL() 
@@ -198,7 +203,7 @@ namespace ePBR
 		m_unitCube->Draw();
 	}
 
-	std::shared_ptr<CubeMap> Context::ConvoluteCubeMap(std::shared_ptr<CubeMap> _cubeMap) 
+	std::shared_ptr<CubeMap> Context::GenerateDiffuseIrradianceMap(std::shared_ptr<CubeMap> _cubeMap) 
 	{
 		if (!m_convolutionShader) 
 		{
@@ -208,7 +213,38 @@ namespace ePBR
 			m_convolutionEnvironementMapPos = glGetUniformLocation(m_convolutionShader->GetID(), "environmentMap");
 		}
 
-		std::shared_ptr<CubeMap> conv(new CubeMap(DEFAULT_CONVOLUTED_CUBEMAP_WIDTH));
+		std::shared_ptr<CubeMap> conv(new CubeMap());
+
+		glGenFramebuffers(1, &conv->m_frameBufferID);
+		glGenRenderbuffers(1, &conv->m_renderBufferID);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, conv->m_frameBufferID);
+		glBindRenderbuffer(GL_RENDERBUFFER, conv->m_renderBufferID);
+
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, conv->m_renderBufferID);
+
+		// Generate textures
+		glGenTextures(1, &conv->m_mapID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, conv->m_mapID);
+
+		for (unsigned int i = 0; i < 6; i++)
+		{
+			// Presuming HDR for now
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH, 0, GL_RGB, GL_FLOAT, nullptr);
+		}
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 		Mesh mesh;
 		mesh.SetAsCube(0.5f);
@@ -228,7 +264,7 @@ namespace ePBR
 		glUniform1i(m_convolutionEnvironementMapPos, 0);
 		glUniformMatrix4fv(m_convolutionProjectionPos, 1, false, glm::value_ptr(projectionMat));
 
-		glActiveTexture(0);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, _cubeMap->GetMapID());
 
 		glViewport(0,0, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH);
@@ -255,6 +291,141 @@ namespace ePBR
 		return conv;
 	}
 
+	std::shared_ptr<CubeMap> Context::GeneratePrefilterIrradianceMap(std::shared_ptr<CubeMap> _cubeMap)
+	{
+		if (!m_prefilteringShader) 
+		{
+			m_prefilteringShader = std::make_shared<Shader>(m_pwd + "data/shaders/environment_mapping/SpecularPrefilter.vert", m_pwd + "data/shaders/environment_mapping/SpecularPrefilter.frag");
+			m_prefilterEnvironmentMapPos = glGetUniformLocation(m_prefilteringShader->GetID(), "environmentMap");
+			m_prefilterProjectionPos = glGetUniformLocation(m_prefilteringShader->GetID(), "projection");
+			m_prefilterViewPos = glGetUniformLocation(m_prefilteringShader->GetID(), "view");
+			m_prefilterRoughnessPos = glGetUniformLocation(m_prefilteringShader->GetID(), "roughness");
+		}
+
+		std::shared_ptr<CubeMap> prefilterMap(new CubeMap());
+
+		glGenFramebuffers(1, &prefilterMap->m_frameBufferID);
+		glGenRenderbuffers(1, &prefilterMap->m_renderBufferID);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, prefilterMap->m_frameBufferID);
+		glBindRenderbuffer(GL_RENDERBUFFER, prefilterMap->m_renderBufferID);
+
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, prefilterMap->m_renderBufferID);
+
+		glGenTextures(1, &prefilterMap->m_mapID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap->m_mapID);
+		for (unsigned int i = 0; i < 6; ++i)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, DEFAULT_PREFILTER_CUBEMAP_WIDTH, DEFAULT_PREFILTER_CUBEMAP_WIDTH, 0, GL_RGB, GL_FLOAT, nullptr);
+		}
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Enable trilinear filtering
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+		Mesh mesh;
+		mesh.SetAsCube(0.5f);
+
+		glm::mat4 projectionMat = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+		glm::mat4 viewMatrices[] =
+		{
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(1.0f,0.0f,0.0f), glm::vec3(0.0f,-1.0f,0.0f)),
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-1.0f,0.0f,0.0f), glm::vec3(0.0f,-1.0f,0.0f)),
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,1.0f,0.0f), glm::vec3(0.0f,0.0f,1.0f)),
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,-1.0f,0.0f), glm::vec3(0.0f,0.0f,-1.0f)),
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,0.0f,1.0f), glm::vec3(0.0f,-1.0f,0.0f)),
+			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(0.0f,0.0f,-1.0f), glm::vec3(0.0f,-1.0f,0.0f))
+		};
+
+		glUseProgram(m_prefilteringShader->GetID());
+		glUniformMatrix4fv(m_prefilterProjectionPos, 1, false, glm::value_ptr(projectionMat));
+
+		glActiveTexture(GL_TEXTURE0);
+		glUniform1i(m_prefilterEnvironmentMapPos, 0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, _cubeMap->GetMapID());
+
+		glFrontFace(GL_CW);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, prefilterMap->m_frameBufferID);
+		unsigned int maxMipLevels = 5;
+		for (unsigned int mip = 0; mip < maxMipLevels; mip++) 
+		{
+			// Resize framebuffer according to mip-level size
+			unsigned int mipWidth = DEFAULT_PREFILTER_CUBEMAP_WIDTH * std::pow(0.5, mip);
+			unsigned int mipHeight = DEFAULT_PREFILTER_CUBEMAP_WIDTH * std::pow(0.5, mip);
+			glBindRenderbuffer(GL_RENDERBUFFER, prefilterMap->m_renderBufferID);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
+			glViewport(0, 0, mipWidth, mipHeight);
+
+			float roughness = (float)mip / (float)(maxMipLevels - 1);
+			glUniform1f(m_prefilterRoughnessPos, roughness);
+			for (unsigned int i = 0; i < 6; i++) 
+			{
+				glUniformMatrix4fv(m_prefilterViewPos, 1, false, glm::value_ptr(viewMatrices[i]));
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap->GetMapID(), mip);
+
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				mesh.Draw();
+			}
+		}
+
+		glFrontFace(GL_CCW);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		return prefilterMap;
+	}
+
+	std::shared_ptr<Texture> Context::GetBRDFLookupTexture() 
+	{
+		if (m_BRDFLUT) return m_BRDFLUT;
+
+		m_BRDFLUT = std::make_shared<Texture>();
+		glGenTextures(1, &m_BRDFLUT->m_ID);
+
+		GLuint fbo, rbo;
+
+		glGenFramebuffers(1, &fbo);
+		glGenRenderbuffers(1, &rbo);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, DEFAULT_BRDF_LOOK_UP_TEXTURE_WIDTH, DEFAULT_BRDF_LOOK_UP_TEXTURE_WIDTH);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+		glBindTexture(GL_TEXTURE_2D, m_BRDFLUT->m_ID);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, DEFAULT_BRDF_LOOK_UP_TEXTURE_WIDTH, DEFAULT_BRDF_LOOK_UP_TEXTURE_WIDTH, 0, GL_RG, GL_FLOAT, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_BRDFLUT->m_ID, 0);
+
+		glViewport(0,0, DEFAULT_BRDF_LOOK_UP_TEXTURE_WIDTH, DEFAULT_BRDF_LOOK_UP_TEXTURE_WIDTH);
+		
+		std::shared_ptr<Shader> integrationMapShader = std::make_shared<Shader>(m_pwd + "data/shaders/environment_mapping/SpecularPrefilter.vert", m_pwd + "data/shaders/environment_mapping/SpecularPrefilter.frag");
+		glm::mat4 projectionMat = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+		//glUniformMatrix4fv(glGetUniformLocation(integrationMapShader->GetID(), "projection"), 1, false, glm::value_ptr(projectionMat));
+		//glUniformMatrix4fv(glGetUniformLocation(integrationMapShader->GetID(), "view"), 1, false, glm::value_ptr(glm::lookAt(glm::vec3(0), glm::vec3(0,0,10), glm::vec3(0,1,0))));
+		
+		Mesh quad;
+		quad.SetAsQuad(0.5f, 0.5f);
+		
+		glUseProgram(integrationMapShader->GetID());
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		quad.Draw();
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		return m_BRDFLUT;
+	}
+
 	Context::Context(std::string _projectWorkingDirectory) :
 		m_SDL_Renderer(NULL),
 		m_window(NULL),
@@ -268,7 +439,11 @@ namespace ePBR
 		m_skyboxViewPos(0),
 		m_convolutionViewPos(0),
 		m_convolutionProjectionPos(0),
-		m_convolutionEnvironementMapPos(0)
+		m_convolutionEnvironementMapPos(0),
+		m_prefilterEnvironmentMapPos(0),
+		m_prefilterProjectionPos(0),
+		m_prefilterRoughnessPos(0),
+		m_prefilterViewPos(0)
 	{
 	}
 

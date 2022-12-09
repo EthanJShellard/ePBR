@@ -9,6 +9,8 @@ namespace ePBR
 {
 	class Texture 
 	{
+		friend class Context;
+
 		GLuint m_ID;
 
 	public:

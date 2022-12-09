@@ -15,7 +15,7 @@ namespace ePBR
 
 		unsigned int m_frameBufferID, m_renderBufferID, m_mapID;
 
-		CubeMap(int _width);
+		CubeMap();
 		CubeMap(int _width, std::shared_ptr<Texture> _equirectangularMap, std::shared_ptr<Shader> _equirectangularToCubemapShader);
 	public:
 		unsigned int GetMapID();
