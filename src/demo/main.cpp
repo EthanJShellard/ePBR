@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 		material->SetMetalnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_metallic.png");
 		material->SetNormalMap(pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
 		material->SetRoughnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
-		material->LoadShaders(pwd + "data\\shaders\\PBRVert.txt", pwd + "data\\shaders\\PBRFrag.txt");
+		material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBR.frag");
 
 		// Get equirectangular map and generate cubemap
 		std::shared_ptr<ePBR::Texture> equirectangularMap = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
@@ -44,13 +44,15 @@ int main(int argc, char* argv[])
 		std::shared_ptr<ePBR::Texture> brdfLUT = context.GetBRDFLookupTexture();
 
 		material->SetEnvironmentMap(convolutedCubeMap);
+		material->SetPrefilterEnvironmentMap(prefilterEnvMap);
+		material->SetBRDFLookupTexture(brdfLUT);
 
 		// The mesh is the geometry for the object
 		std::shared_ptr<ePBR::Mesh> modelMesh = std::make_shared<ePBR::Mesh>();
 		//// Load from OBJ file. This must have triangulated geometry
-		//modelMesh->LoadOBJ(pwd + "data\\models\\sphere\\triangulated.obj");
-		modelMesh->SetAsQuad(0.5f, 0.5f);
-		material->SetAlbedoTexture(brdfLUT);
+		modelMesh->LoadOBJ(pwd + "data\\models\\sphere\\triangulated.obj");
+		//modelMesh->SetAsQuad(0.5f, 0.5f);
+		//material->SetAlbedoTexture(brdfLUT);
 
 		// Set up model
 		std::shared_ptr<ePBR::Model> testModel = std::make_shared<ePBR::Model>();

@@ -4,6 +4,10 @@ in vec2 positionV;
 in vec2 normalV;
 in vec2 texCoordV;
 
+out vec2 fragColour;
+
+const float PI = 3.14159265359;
+
 // Van Der Corput sequence.
 float RadicalInverse_Vdc(uint bits)
 {
@@ -72,7 +76,7 @@ float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 vec2 IntegrateBRDF(float NdotV, float roughness)
 {
     vec3 V;
-    v.x = sqrt(1.0 - NdotV*NdotV);
+    V.x = sqrt(1.0 - NdotV*NdotV);
     V.y = 0.0;
     V.z = NdotV;
 

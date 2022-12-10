@@ -408,13 +408,13 @@ namespace ePBR
 
 		glViewport(0,0, DEFAULT_BRDF_LOOK_UP_TEXTURE_WIDTH, DEFAULT_BRDF_LOOK_UP_TEXTURE_WIDTH);
 		
-		std::shared_ptr<Shader> integrationMapShader = std::make_shared<Shader>(m_pwd + "data/shaders/environment_mapping/SpecularPrefilter.vert", m_pwd + "data/shaders/environment_mapping/SpecularPrefilter.frag");
+		std::shared_ptr<Shader> integrationMapShader = std::make_shared<Shader>(m_pwd + "data/shaders/environment_mapping/IntegrationMap.vert", m_pwd + "data/shaders/environment_mapping/IntegrationMap.frag");
 		glm::mat4 projectionMat = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 		//glUniformMatrix4fv(glGetUniformLocation(integrationMapShader->GetID(), "projection"), 1, false, glm::value_ptr(projectionMat));
 		//glUniformMatrix4fv(glGetUniformLocation(integrationMapShader->GetID(), "view"), 1, false, glm::value_ptr(glm::lookAt(glm::vec3(0), glm::vec3(0,0,10), glm::vec3(0,1,0))));
 		
 		Mesh quad;
-		quad.SetAsQuad(0.5f, 0.5f);
+		quad.SetAsQuad(1.0f, 1.0f);
 		
 		glUseProgram(integrationMapShader->GetID());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

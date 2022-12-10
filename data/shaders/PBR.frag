@@ -25,6 +25,8 @@ layout(location = 2) uniform sampler2D metalnessMap;
 layout(location = 3) uniform sampler2D roughnessMap;
 layout(location = 4) uniform sampler2D ambientOcclusionMap;
 layout(location = 5) uniform samplerCube irradianceMap;
+layout(location = 6) uniform samplerCube prefilterMap;
+layout(location = 7) uniform sampler2D brdfLUT;
 
 // This is the output, it is the fragment's (pixel's) colour
 out vec4 fragColour;
@@ -85,8 +87,6 @@ float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 
 void main()
 {
-    
-
     vec3 viewDir = normalize(camPos - positionV);
 
     // Sample albedo
@@ -127,7 +127,7 @@ void main()
 
     // Reflectance:
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < 1; i++)
+    for(int i = 2; i < 1; i++)
     {
         vec3 lightDir = normalize(lightPositions[i] - positionV);
         vec3 halfVec = normalize(viewDir + lightDir);
@@ -160,6 +160,16 @@ void main()
         Lo += (kD * texAlbedo / PI + specular) * radiance * nDotL;
     }
 
+    // Get prefiltered reflection colour
+    vec3 R = reflect(-viewDir, normal);
+    const float MAX_REFLECTION_LOD = 4.0; // Using 5 mip levels
+    vec3 prefilteredColour = textureLod(prefilterMap, R, texRoughness * MAX_REFLECTION_LOD).rgb;
+
+    // Sample brdfLookup texture using material roughness and angle between normal and view
+    vec3 F = fresnelSchlickRoughness(max(dot(normal, viewDir), 0.0), F0, roughness);
+    vec2 envBRDF = texture(brdfLUT, vec2(max(dot(normal, viewDir), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColour * (F * envBRDF.x + envBRDF.y);
+
     // Fake ambient
     //vec3 ambient = vec3(0.001) * texAlbedo/* * ao*/;
     // Separate diffuse and specular component of irradiance map
@@ -167,7 +177,9 @@ void main()
     vec3 kD = 1.0 - kS;
     vec3 irradiance = texture(irradianceMap, normal).rgb;
     vec3 diffuse = irradiance * texAlbedo;
-    vec3 ambient = (kD * diffuse); //* ao;
+    
+    vec3 ambient = (kD * diffuse + specular); //* ao;
+
 
     // Final lit colour
     vec3 colour = ambient + Lo;

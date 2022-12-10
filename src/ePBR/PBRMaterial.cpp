@@ -68,6 +68,8 @@ namespace ePBR
 		m_roughnessMapSamplerLocation = glGetUniformLocation(id, "roughnessMap");
 		m_ambientOcclusionMapSamplerLocation = glGetUniformLocation(id, "ambientOcclusionMap");
 		m_irradianceMapSamplerLocation = glGetUniformLocation(id, "irradianceMap");
+		m_prefilteredEnvironmentMapSamplerLocation = glGetUniformLocation(id, "prefilterMap");
+		m_brdfLookupTextureSamplerLocation = glGetUniformLocation(id, "brdfLUT");
 
 		return true;
 	}
@@ -97,6 +99,9 @@ namespace ePBR
 		m_roughnessMapSamplerLocation = glGetUniformLocation(id, "roughnessMap");
 		m_ambientOcclusionMapSamplerLocation = glGetUniformLocation(id, "ambientOcclusionMap");
 		m_irradianceMapSamplerLocation = glGetUniformLocation(id, "irradianceMap");
+		m_prefilteredEnvironmentMapSamplerLocation = glGetUniformLocation(id, "prefilterMap");
+		m_brdfLookupTextureSamplerLocation = glGetUniformLocation(id, "brdfLUT");
+
 	}
 
 	void PBRMaterial::Apply(glm::mat4 _modelMatrix, glm::mat4 _invModelMatrix, glm::mat4 _viewMatrix, glm::mat4 _projMatrix, glm::vec3 _camPos) 
@@ -140,6 +145,20 @@ namespace ePBR
 			glActiveTexture(GL_TEXTURE5);
 			glUniform1i(m_irradianceMapSamplerLocation, 5);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, m_irradianceMap->GetMapID());
+		}
+
+		if (m_prefilterMap) 
+		{
+			glActiveTexture(GL_TEXTURE6);
+			glUniform1i(m_prefilteredEnvironmentMapSamplerLocation, 6);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, m_prefilterMap->GetMapID());
+		}
+
+		if (m_brdfLUT) 
+		{
+			glActiveTexture(GL_TEXTURE7);
+			glUniform1i(m_brdfLookupTextureSamplerLocation, 7);
+			glBindTexture(GL_TEXTURE_2D, m_brdfLUT->GetID());
 		}
 	}
 }
