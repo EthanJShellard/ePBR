@@ -47,7 +47,7 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-// Test DistributionGGX
+// Test DistributionGGX (NDF)
 float DistributionGGX(vec3 normal, vec3 halfVec, float roughness)
 {
     float a = roughness * roughness;
@@ -84,6 +84,8 @@ float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 
     return ggx1 * ggx2;
 }
+
+
 
 void main()
 {

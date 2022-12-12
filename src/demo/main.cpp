@@ -36,15 +36,30 @@ int main(int argc, char* argv[])
 		material->SetRoughnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
 		material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBR.frag");
 
-		// Get equirectangular map and generate cubemap
-		std::shared_ptr<ePBR::Texture> equirectangularMap = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
-		std::shared_ptr<ePBR::CubeMap> cubeMap = context.GenerateCubemap(equirectangularMap);
-		std::shared_ptr<ePBR::CubeMap> convolutedCubeMap = context.GenerateDiffuseIrradianceMap(cubeMap);
-		std::shared_ptr<ePBR::CubeMap> prefilterEnvMap = context.GeneratePrefilterIrradianceMap(cubeMap);
+		
+		std::shared_ptr<ePBR::CubeMap> cubeMap1, convolutedCubeMap1, prefilterEnvMap1;
+		{
+			std::shared_ptr<ePBR::Texture> equirectangularMap1 = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\EnvironmentMaps\\HDR_029_Sky_Cloudy_Ref.hdr", true);
+			cubeMap1 = context.GenerateCubemap(equirectangularMap1);
+			convolutedCubeMap1 = context.GenerateDiffuseIrradianceMap(cubeMap1);
+			prefilterEnvMap1 = context.GeneratePrefilterIrradianceMap(cubeMap1);
+		}
+
+		// Get second equirectangular map and generate cubemap
+		std::shared_ptr<ePBR::CubeMap> cubeMap2, convolutedCubeMap2, prefilterEnvMap2;
+		{
+			std::shared_ptr<ePBR::Texture> equirectangularMap2 = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\EnvironmentMaps\\Old town by nite.jpg", true);
+			cubeMap2 = context.GenerateCubemap(equirectangularMap2);
+			convolutedCubeMap2 = context.GenerateDiffuseIrradianceMap(cubeMap2);
+			prefilterEnvMap2 = context.GeneratePrefilterIrradianceMap(cubeMap2);
+		}
+
+		std::shared_ptr<ePBR::CubeMap> selectedSkybox = cubeMap1;
+
 		std::shared_ptr<ePBR::Texture> brdfLUT = context.GetBRDFLookupTexture();
 
-		material->SetEnvironmentMap(convolutedCubeMap);
-		material->SetPrefilterEnvironmentMap(prefilterEnvMap);
+		material->SetEnvironmentMap(convolutedCubeMap1);
+		material->SetPrefilterEnvironmentMap(prefilterEnvMap1);
 		material->SetBRDFLookupTexture(brdfLUT);
 
 		// The mesh is the geometry for the object
@@ -97,7 +112,7 @@ int main(int argc, char* argv[])
 						cmdRotateRight = true;
 						break;
 					case SDLK_SPACE:
-						material->LoadShaders(pwd + "data\\shaders\\PBRVert.txt", pwd + "data\\shaders\\PBRFrag.txt");
+						material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBR.frag");
 						break;
 					}
 					break;
@@ -120,6 +135,15 @@ int main(int argc, char* argv[])
 					case SDLK_RIGHT:
 						cmdRotateRight = false;
 						break;
+					case SDLK_1:
+						material->SetEnvironmentMap(convolutedCubeMap1);
+						material->SetPrefilterEnvironmentMap(prefilterEnvMap1);
+						selectedSkybox = cubeMap1;
+						break;
+					case SDLK_2:
+						material->SetEnvironmentMap(convolutedCubeMap2);
+						material->SetPrefilterEnvironmentMap(prefilterEnvMap2);
+						selectedSkybox = cubeMap2;
 					}
 					break;
 				}
@@ -149,7 +173,7 @@ int main(int argc, char* argv[])
 			renderer.SetModel(testModel);
 			renderer.Draw();
 
-			context.RenderSkyBox(cubeMap, viewMatrix, projectionMatrix);
+			context.RenderSkyBox(selectedSkybox, viewMatrix, projectionMatrix);
 
 			context.DisplayFrame();	
 		}
