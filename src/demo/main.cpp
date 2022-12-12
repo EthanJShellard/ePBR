@@ -206,21 +206,15 @@ int main(int argc, char* argv[])
 				}
 
 				// Shader switching
-				if (ImGui::Button("Use IBL only shader")) 
+				if (ImGui::Button( useIBLShader ? "Reload IBL only shader (current)" : "Use IBL only shader")) 
 				{
-					if (!useIBLShader)
-					{
-						useIBLShader = !useIBLShader;
-						material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
-					}
+					useIBLShader = true;
+					material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
 				}
-				if (ImGui::Button("Use direct lighting only shader")) 
+				if (ImGui::Button(!useIBLShader ? "Reload direct lighting only shader (current)" : "Use direct lighting only shader")) 
 				{
-					if (useIBLShader)
-					{
-						useIBLShader = !useIBLShader;
-						material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRDirectLighting.frag");
-					}
+					useIBLShader = false;
+					material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRDirectLighting.frag");
 				}
 
 				// Display FPS
