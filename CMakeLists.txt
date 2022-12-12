@@ -31,8 +31,6 @@ add_library(imgui
 )
 
 add_library(ePBR
-    src/ePBR/Material.h
-    src/ePBR/Material.cpp
     src/ePBR/Mesh.h
     src/ePBR/Mesh.cpp
     src/ePBR/Context.h

@@ -26,6 +26,8 @@ namespace ePBR
 		m_roughnessMapSamplerLocation(0),
 		m_normalMapSamplerLocation(0),
 		m_irradianceMapSamplerLocation(0),
+		m_prefilteredEnvironmentMapSamplerLocation(0),
+		m_brdfLookupTextureSamplerLocation(0),
 		m_shaderProgram(std::make_shared<Shader>()),
 		m_albedoTexture(std::make_shared<Texture>()),
 		m_normalMap(std::make_shared<Texture>()),
@@ -39,7 +41,7 @@ namespace ePBR
 	{
 	}
 
-	bool PBRMaterial::LoadShaders(std::string _vertFilename, std::string _fragFilename)
+	std::shared_ptr<Shader> PBRMaterial::LoadShaderProgram(std::string _vertFilename, std::string _fragFilename)
 	{
 		// OpenGL doesn't provide any functions for loading shaders from file
 
@@ -71,7 +73,7 @@ namespace ePBR
 		m_prefilteredEnvironmentMapSamplerLocation = glGetUniformLocation(id, "prefilterMap");
 		m_brdfLookupTextureSamplerLocation = glGetUniformLocation(id, "brdfLUT");
 
-		return true;
+		return m_shaderProgram;
 	}
 
 	void PBRMaterial::SetShader(std::shared_ptr<Shader> _newShader)
@@ -160,5 +162,35 @@ namespace ePBR
 			glUniform1i(m_brdfLookupTextureSamplerLocation, 7);
 			glBindTexture(GL_TEXTURE_2D, m_brdfLUT->GetID());
 		}
+	}
+
+	std::shared_ptr<Texture> PBRMaterial::SetAlbedoTexture(std::string _fileName, bool _isHDR) 
+	{
+		_isHDR ? m_albedoTexture->LoadHDR(_fileName) : m_albedoTexture->Load(_fileName);
+		return m_albedoTexture;
+	}
+
+	std::shared_ptr<Texture> PBRMaterial::SetNormalMap(std::string _fileName, bool _isHDR) 
+	{
+		_isHDR ? m_normalMap->LoadHDR(_fileName) : m_normalMap->Load(_fileName); 
+		return m_normalMap;
+	}
+
+	std::shared_ptr<Texture> PBRMaterial::SetMetalnessMap(std::string _fileName, bool _isHDR) 
+	{
+		_isHDR ? m_metalnessMap->LoadHDR(_fileName) : m_metalnessMap->Load(_fileName); 
+		return m_metalnessMap;
+	}
+
+	std::shared_ptr<Texture> PBRMaterial::SetRoughnessMap(std::string _fileName, bool _isHDR) 
+	{
+		_isHDR ? m_roughnessMap->LoadHDR(_fileName) : m_roughnessMap->Load(_fileName); 
+		return m_roughnessMap;
+	}
+
+	std::shared_ptr<Texture> PBRMaterial::SetAmbientOcclusionMap(std::string _fileName, bool _isHDR) 
+	{
+		_isHDR ? m_ambientOcclusionMap->LoadHDR(_fileName) : m_ambientOcclusionMap->Load(_fileName); 
+		return m_ambientOcclusionMap;
 	}
 }

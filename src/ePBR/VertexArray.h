@@ -8,27 +8,35 @@
 
 namespace ePBR
 {
-	//Forward Declaration
 	class VertexBuffer;
 
-	//Wrapper for vertex array objects. Will bind buffers lazily, when GetID() is called.
+	/// @brief Wrapper for vertex array objects. Will bind buffers lazily, when GetID() is called.
 	class VertexArray
 	{
 	public:
-		/// <summary>
-		/// Set a vertex buffer on this VBO. This will make the Vertex Array dirty
-		/// </summary>
-		void SetBuffer(std::shared_ptr<VertexBuffer> _buffer, int _position);
-		//Bind buffers if they've changed and then return ID
+		
+		/// @brief Set a vertex buffer on this vertex array.
+		/// @param _buffer The new buffer.
+		/// @param _index The index at which the new buffer will be placed.
+		void SetBuffer(std::shared_ptr<VertexBuffer> _buffer, int _index);
+
+		/// @brief Get the OpenGL ID of this vertex array.
+		/// @return The ID.
 		GLuint GetID();
-		size_t GetVertCount();
-		void SetVertCount(size_t _count);
+
+		/// @brief Get the number of vertices associated with this vertex array.
+		/// @return The vertex count.
+		unsigned int GetVertCount() const;
+
+		/// @brief Set the number of vertices assoiciated with this vertex array.
+		/// @param _count The new vertex count.
+		void SetVertCount(unsigned int _count);
 
 		VertexArray();
 		~VertexArray();
 	private:
 		GLuint m_id;
-		size_t m_vertCount;
+		unsigned int m_vertCount;
 		bool m_dirty;
 		std::vector< std::shared_ptr<VertexBuffer> > m_buffers;
 	};

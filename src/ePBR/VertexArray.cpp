@@ -35,12 +35,12 @@ namespace ePBR
 		return m_id;
 	}
 
-	size_t VertexArray::GetVertCount()
+	unsigned int VertexArray::GetVertCount() const
 	{
 		return m_vertCount;
 	}
 
-	void VertexArray::SetVertCount(size_t _count)
+	void VertexArray::SetVertCount(unsigned int _count)
 	{
 		m_vertCount = _count;
 	}

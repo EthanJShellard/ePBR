@@ -18,9 +18,9 @@ namespace ePBR
 		CubeMap();
 		CubeMap(int _width, std::shared_ptr<Texture> _equirectangularMap, std::shared_ptr<Shader> _equirectangularToCubemapShader);
 	public:
-		unsigned int GetMapID();
-		unsigned int GetRenderbufferID();
-		unsigned int GetFramebufferID();
+		/// @brief Get the gl ID of this CubeMap's texture.
+		/// @return The gl ID of this CubeMap's texture.
+		unsigned int GetMapID() const;
 
 		~CubeMap();
 	};

@@ -191,12 +191,13 @@ namespace ePBR
 		// Env map
 		glUniform1i(m_skyboxEnvironmentMapLocation, 0);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, _environmentMap->GetMapID());
+		glBindTexture(GL_TEXTURE_CUBE_MAP, _environmentMap->m_mapID);
 
 		// Matrices
 		glUniformMatrix4fv(m_skyboxProjectionPos, 1, false, glm::value_ptr(_projectionMat));
 		glUniformMatrix4fv(m_skyboxViewPos, 1, false, glm::value_ptr(_viewMat));
 
+		// Ensure that we draw behind everything else!
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_EQUAL);
 
@@ -205,6 +206,11 @@ namespace ePBR
 
 	std::shared_ptr<CubeMap> Context::GenerateDiffuseIrradianceMap(std::shared_ptr<CubeMap> _cubeMap) 
 	{
+		if (!m_unitCube) 
+		{
+			m_unitCube = std::make_shared<Mesh>();
+			m_unitCube->SetAsCube(0.5f);
+		}
 		if (!m_convolutionShader) 
 		{
 			m_convolutionShader = std::make_shared<Shader>(m_pwd + "data/shaders/environment_mapping/ConvoluteCubemap.vert", m_pwd + "data/shaders/environment_mapping/ConvoluteCubemap.frag");
@@ -246,10 +252,9 @@ namespace ePBR
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-		Mesh mesh;
-		mesh.SetAsCube(0.5f);
-
 		glm::mat4 projectionMat = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+
+		// View matrices targetting each side of a cube.
 		glm::mat4 viewMatrices[] =
 		{
 			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(1.0f,0.0f,0.0f), glm::vec3(0.0f,-1.0f,0.0f)),
@@ -265,21 +270,21 @@ namespace ePBR
 		glUniformMatrix4fv(m_convolutionProjectionPos, 1, false, glm::value_ptr(projectionMat));
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, _cubeMap->GetMapID());
+		glBindTexture(GL_TEXTURE_CUBE_MAP, _cubeMap->m_mapID);
 
 		glViewport(0,0, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH, DEFAULT_CONVOLUTED_CUBEMAP_WIDTH);
-		glBindFramebuffer(GL_FRAMEBUFFER, conv->GetFramebufferID());
-		glBindRenderbuffer(GL_RENDERBUFFER, conv->GetRenderbufferID());
+		glBindFramebuffer(GL_FRAMEBUFFER, conv->m_frameBufferID);
+		glBindRenderbuffer(GL_RENDERBUFFER, conv->m_renderBufferID);
 
 		glFrontFace(GL_CW);
 
 		for (int i = 0; i < 6; i++) 
 		{
 			glUniformMatrix4fv(m_convolutionViewPos, 1, false, glm::value_ptr(viewMatrices[i]));
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, conv->GetMapID(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, conv->m_mapID, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			mesh.Draw();
+			m_unitCube->Draw();
 		}
 
 		glFrontFace(GL_CCW);
@@ -293,6 +298,11 @@ namespace ePBR
 
 	std::shared_ptr<CubeMap> Context::GeneratePrefilterIrradianceMap(std::shared_ptr<CubeMap> _cubeMap)
 	{
+		if (!m_unitCube) 
+		{
+			m_unitCube = std::make_shared<Mesh>();
+			m_unitCube->SetAsCube(0.5f);
+		}
 		if (!m_prefilteringShader) 
 		{
 			m_prefilteringShader = std::make_shared<Shader>(m_pwd + "data/shaders/environment_mapping/SpecularPrefilter.vert", m_pwd + "data/shaders/environment_mapping/SpecularPrefilter.frag");
@@ -327,10 +337,9 @@ namespace ePBR
 
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-		Mesh mesh;
-		mesh.SetAsCube(0.5f);
-
 		glm::mat4 projectionMat = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+
+		// View matrices targetting each side of a cube.
 		glm::mat4 viewMatrices[] =
 		{
 			glm::lookAt(glm::vec3(0.0f,0.0f,0.0f), glm::vec3(1.0f,0.0f,0.0f), glm::vec3(0.0f,-1.0f,0.0f)),
@@ -346,15 +355,13 @@ namespace ePBR
 
 		glActiveTexture(GL_TEXTURE0);
 		glUniform1i(m_prefilterEnvironmentMapPos, 0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, _cubeMap->GetMapID());
-
-		glFrontFace(GL_CW);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, _cubeMap->m_mapID);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, prefilterMap->m_frameBufferID);
 		unsigned int maxMipLevels = 5;
 		for (unsigned int mip = 0; mip < maxMipLevels; mip++) 
 		{
-			// Resize framebuffer according to mip-level size
+			// Resize framebuffer according to mip-level size. Going to leverage gl texture filtering.
 			unsigned int mipWidth = DEFAULT_PREFILTER_CUBEMAP_WIDTH * std::pow(0.5, mip);
 			unsigned int mipHeight = DEFAULT_PREFILTER_CUBEMAP_WIDTH * std::pow(0.5, mip);
 			glBindRenderbuffer(GL_RENDERBUFFER, prefilterMap->m_renderBufferID);
@@ -366,14 +373,12 @@ namespace ePBR
 			for (unsigned int i = 0; i < 6; i++) 
 			{
 				glUniformMatrix4fv(m_prefilterViewPos, 1, false, glm::value_ptr(viewMatrices[i]));
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap->GetMapID(), mip);
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap->m_mapID, mip);
 
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				mesh.Draw();
+				m_unitCube->Draw();
 			}
 		}
-
-		glFrontFace(GL_CCW);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		return prefilterMap;
@@ -409,9 +414,6 @@ namespace ePBR
 		glViewport(0,0, DEFAULT_BRDF_LOOK_UP_TEXTURE_WIDTH, DEFAULT_BRDF_LOOK_UP_TEXTURE_WIDTH);
 		
 		std::shared_ptr<Shader> integrationMapShader = std::make_shared<Shader>(m_pwd + "data/shaders/environment_mapping/IntegrationMap.vert", m_pwd + "data/shaders/environment_mapping/IntegrationMap.frag");
-		glm::mat4 projectionMat = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-		//glUniformMatrix4fv(glGetUniformLocation(integrationMapShader->GetID(), "projection"), 1, false, glm::value_ptr(projectionMat));
-		//glUniformMatrix4fv(glGetUniformLocation(integrationMapShader->GetID(), "view"), 1, false, glm::value_ptr(glm::lookAt(glm::vec3(0), glm::vec3(0,0,10), glm::vec3(0,1,0))));
 		
 		Mesh quad;
 		quad.SetAsQuad(1.0f, 1.0f);

@@ -6,18 +6,40 @@
 
 namespace ePBR
 {
-	//Shader wrapper with lazy compilation
+	/// @brief Shader wrapper with lazy compilation
 	class Shader
 	{
 	public:
+		/// @brief Load a new vertex shader for this shader program.
+		/// @details Compilation and linking will be performed when GetID is called.
+		/// @param _path The path to the new shader.
 		void LoadNewVertexShader(const char* _path);
+
+		/// @brief Load a new fragment shader for this shader program.
+		/// @details Compilation and linking will be performed when GetID is called.
+		/// @param _path The path to the new shader.
 		void LoadNewFragmentShader(const char* _path);
+
+		/// @brief Bind an OpenGL attribute at a specified index.
+		/// @param index The index at which the attribute will be bound.
+		/// @param _identifier The identifier of the attribute.
 		void BindAttribute(int index, const char* _identifier);
-		//Link shader program if anything has changed and return the ID
+
+		/// @brief Link shader program if anything has changed and return the ID
+		/// @return The OpenGL ID of this shader program.
 		GLuint GetID();
 
+		/// @brief Create a shader program using a vertex and fragment shader.
+		/// @param _vertexPath The path to the vertex shader.
+		/// @param _fragmentPath The path to the fragment shader.
 		Shader(const char* _vertexPath, const char* _fragmentPath);
+
+		/// @brief Create a shader program using a vertex and fragment shader.
+		/// @param _vertexPath The path to the vertex shader.
+		/// @param _fragmentPath The path to the fragment shader.
 		Shader(const std::string& _vertexPath, const std::string& _fragmentPath);
+
+		/// @brief Create an empty shader.
 		Shader();
 		~Shader();
 	protected:

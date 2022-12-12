@@ -12,7 +12,6 @@
 
 namespace ePBR 
 {
-	// For loading a mesh from OBJ file and keeping a reference for it
 	class Mesh
 	{
 	public:
@@ -20,15 +19,24 @@ namespace ePBR
 		Mesh();
 		~Mesh();
 
-		// OBJ file must be triangulated
+		/// @brief Load a mesh from a wavefront OBJ file. The mesh must be triangulated.
+		/// @param _filename The path to the OBJ mesh to import.
 		void LoadOBJ(std::string _filename);
 
+		/// @brief Set this mesh to a uniform cube.
+		/// @param _halfWidth Half of the desired cube's width.
 		void SetAsCube(float _halfWidth);
+
+		/// @brief Set this mesh to a quad.
+		/// @param _halfWidth Half the width of the desired quad.
+		/// @param _halfHeight Half the height of the desired quad.
 		void SetAsQuad(float _halfWidth, float _halfHeight);
 
+		/// @brief Swap out the vertex array of this Mesh.
+		/// @param _newVAO The new vertex array this mesh will use.
 		void SetVertexArray(std::shared_ptr<VertexArray> _newVAO) { m_VAO = _newVAO; };
 
-		// Draws the mesh - must have shaders applied for this to display!
+		/// @brief Bind and draw this mesh. Does not apply any material or shader.
 		void Draw();
 
 	protected:

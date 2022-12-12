@@ -91,9 +91,23 @@ namespace ePBR
 
 	void Renderer::Clear() 
 	{
-		// Specify the colour to clear the framebuffer to
-		glClearColor(m_clearColour.x, m_clearColour.y, m_clearColour.z, m_clearColour.a);
-		// This writes the above colour to the colour part of the framebuffer
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		if (m_renderTexture) 
+		{
+			m_renderTexture->Bind();
+
+			// Specify the colour to clear the framebuffer to
+			glClearColor(m_clearColour.x, m_clearColour.y, m_clearColour.z, m_clearColour.a);
+			// This writes the above colour to the colour part of the framebuffer
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			m_renderTexture->Unbind();
+		}
+		else 
+		{
+			// Specify the colour to clear the framebuffer to
+			glClearColor(m_clearColour.x, m_clearColour.y, m_clearColour.z, m_clearColour.a);
+			// This writes the above colour to the colour part of the framebuffer
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
 	}
 }

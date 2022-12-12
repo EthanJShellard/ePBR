@@ -19,22 +19,22 @@ namespace ePBR
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	}
 
-	void RenderTexture::Bind() 
+	void RenderTexture::Bind() const 
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	}
 
-	void RenderTexture::Unbind() 
+	void RenderTexture::Unbind() const
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	GLuint RenderTexture::GetTextureID() 
+	GLuint RenderTexture::GetTextureID() const
 	{
 		return m_fbt;
 	}
 
-	GLuint RenderTexture::GetFBOID() 
+	GLuint RenderTexture::GetFBOID() const
 	{
 		return m_fbo;
 	}

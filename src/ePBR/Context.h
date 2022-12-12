@@ -58,27 +58,60 @@ namespace ePBR
 
 		bool m_initialised;
 
+		/// @brief Initialise glew.
 		void InitGL();
+		/// @brief Initialise SDL.
 		void InitSDL();
+		/// @brief Initialise the SDL renderer and create the SDL_GL context.
 		void InitSDL_GL();
+		/// @brief Initialise ImGui.
 		void InitImGui();
 	public:
+		/// @brief Initialise this ePBR context. Must be called before anything can be rendered.
+		/// @param _window The window this context should render to. If a null pointer is provided as argument then a window will be created.
 		void Init(SDL_Window* _window);
 
-		/// @brief Maximise the window. Updates window width and height variables which can be used to update Renderers and RenderTextures
+		/// @brief Maximise the window. Updates window width and height variables which can be used to update Renderers and RenderTextures.
 		void MaximiseWindow();
 
+		/// @brief Get the width of the target SDL window.
+		/// @return The width of the target SDL window.
 		int GetWindowWidth() const { return m_windowWidth; }
+
+		/// @brief Get the height of the target SDL window.
+		/// @return The height of the target SDL window.
 		int GetWindowHeight() const { return m_windowHeight; }
 
+		/// @brief Disply the rendered frame in the target SDL window. Should be called after all render calls.
 		void DisplayFrame();
 
+		/// @brief Generate a CubeMap from an equirecatangular environment map.
+		/// @param _equirectangularMap The equirectangular map which should be used to generate the cubemap. Expected to be in HDR format.
+		/// @return The newly generated CubeMap.
 		std::shared_ptr<CubeMap> GenerateCubemap(std::shared_ptr<Texture> _equirectangularMap);
-		void RenderSkyBox(std::shared_ptr<CubeMap> _environmentMap, const glm::mat4& _viewMat, const glm::mat4& _projectionMat);
+
+		/// @brief Draw a skybox behind all other rendered objects.
+		/// @param _cubeMap The CubeMap which will be drawn as a skybox.
+		/// @param _viewMat A matrix representing the position and orientation of the viewpoint from which the skybox will be drawn. Typically that of the main 'camera'.
+		/// @param _projectionMat A matrix representing the projection that will be used to draw the skybox. Typically that of the main 'camera'.
+		void RenderSkyBox(std::shared_ptr<CubeMap> _cubeMap, const glm::mat4& _viewMat, const glm::mat4& _projectionMat);
+		
+		/// @brief Generate a diffuse irradiance map from a cubemap via convolution.
+		/// @param _cubeMap The cubemap to be convoluted.
+		/// @return A newly-generated, convoluted, diffuse irradiance map.
 		std::shared_ptr<CubeMap> GenerateDiffuseIrradianceMap(std::shared_ptr<CubeMap> _cubeMap);
+
+		/// @brief Generate a 'specular' prefilter irradiance map from a cubemap.
+		/// @param _cubeMap The environment map which will be processed to create the prefilter irradiance map.
+		/// @return A newly-generated prefilter irradiance map.
 		std::shared_ptr<CubeMap> GeneratePrefilterIrradianceMap(std::shared_ptr<CubeMap> _cubeMap);
+
+		/// @brief Retrieve the BRDF lookup texture, used as part of specular image based lighting.
+		/// @return The BRDF lookup texture.
 		std::shared_ptr<Texture> GetBRDFLookupTexture();
 
+		/// @brief Construct an ePBR context. Init() will need to be called before rendering can be done.
+		/// @param _projectWorkingDirectory The project working directory - the location of the program's executable and data directory.
 		Context(std::string _projectWorkingDirectory);
 		~Context();
 	};

@@ -130,7 +130,6 @@ namespace ePBR
 	Texture::Texture() : 
 		m_ID(0)
 	{
-	
 	}
 
 	Texture::~Texture() 

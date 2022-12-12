@@ -2,7 +2,6 @@
 #define EPBR_SINGLE_INCLUDE
 
 #include "Context.h"
-#include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
 #include "PBRMaterial.h"

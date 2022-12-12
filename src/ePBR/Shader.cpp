@@ -142,39 +142,36 @@ namespace ePBR
 		return m_id;
 	}
 
-	Shader::Shader(const char* _vertexPath, const char* _fragmentPath)
+	Shader::Shader(const char* _vertexPath, const char* _fragmentPath) :
+		m_dirty(true),
+		m_vertID(0),
+		m_fragID(0),
+		m_id(0)
 	{
-		//Initialise variables
-		m_dirty = true;
-		m_vertID = 0;
-		m_fragID = 0;
-
 		LoadNewVertexShader(_vertexPath);
 		LoadNewFragmentShader(_fragmentPath);
 
 		m_id = glCreateProgram();
 	}
 
-	Shader::Shader(const std::string& _vertexPath, const std::string& _fragmentPath)
+	Shader::Shader(const std::string& _vertexPath, const std::string& _fragmentPath) :
+		m_dirty(true),
+		m_vertID(0),
+		m_fragID(0),
+		m_id(0)
 	{
-		//Initialise variables
-		m_dirty = true;
-		m_vertID = 0;
-		m_fragID = 0;
-
 		LoadNewVertexShader(_vertexPath.c_str());
 		LoadNewFragmentShader(_fragmentPath.c_str());
 
 		m_id = glCreateProgram();
 	}
 
-	Shader::Shader()
+	Shader::Shader() :
+		m_dirty(true),
+		m_vertID(0),
+		m_fragID(0),
+		m_id(0)
 	{
-		//Initialise variables
-		m_dirty = true;
-		m_vertID = 0;
-		m_fragID = 0;
-		m_id = 0;
 	}
 
 	Shader::~Shader()

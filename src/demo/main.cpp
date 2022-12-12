@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 		material->SetMetalnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_metallic.png");
 		material->SetNormalMap(pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
 		material->SetRoughnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
-		material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
+		material->LoadShaderProgram(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
 
 		
 		std::shared_ptr<ePBR::CubeMap> cubeMap1, convolutedCubeMap1, prefilterEnvMap1;
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 
 		std::shared_ptr<ePBR::Texture> brdfLUT = context.GetBRDFLookupTexture();
 
-		material->SetEnvironmentMap(convolutedCubeMap1);
+		material->SetIrradianceMap(convolutedCubeMap1);
 		material->SetPrefilterEnvironmentMap(prefilterEnvMap1);
 		material->SetBRDFLookupTexture(brdfLUT);
 
@@ -172,13 +172,13 @@ int main(int argc, char* argv[])
 
 			context.RenderSkyBox(selectedSkybox, viewMatrix, projectionMatrix);
 
-			// Start the Dear ImGui frame
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui_ImplSDL2_NewFrame();
-			ImGui::NewFrame();
-
 			if (showIMGUI)
 			{
+				// Start the Dear ImGui frame
+				ImGui_ImplOpenGL3_NewFrame();
+				ImGui_ImplSDL2_NewFrame();
+				ImGui::NewFrame();
+
 				// Create a window, give it a name
 				// All ImGui commands after this to create widgets will be added to the window
 				ImGui::Begin("Controls", NULL, ImGuiWindowFlags_AlwaysAutoResize);
@@ -191,14 +191,14 @@ int main(int argc, char* argv[])
 				{
 					if (currentScene) 
 					{
-						material->SetEnvironmentMap(convolutedCubeMap2);
+						material->SetIrradianceMap(convolutedCubeMap2);
 						material->SetPrefilterEnvironmentMap(prefilterEnvMap2);
 						selectedSkybox = cubeMap2;
 						currentScene = !currentScene;
 					}
 					else 
 					{
-						material->SetEnvironmentMap(convolutedCubeMap1);
+						material->SetIrradianceMap(convolutedCubeMap1);
 						material->SetPrefilterEnvironmentMap(prefilterEnvMap1);
 						selectedSkybox = cubeMap1;
 						currentScene = !currentScene;
@@ -209,12 +209,12 @@ int main(int argc, char* argv[])
 				if (ImGui::Button( useIBLShader ? "Reload IBL only shader (current)" : "Use IBL only shader")) 
 				{
 					useIBLShader = true;
-					material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
+					material->LoadShaderProgram(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
 				}
 				if (ImGui::Button(!useIBLShader ? "Reload direct lighting only shader (current)" : "Use direct lighting only shader")) 
 				{
 					useIBLShader = false;
-					material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRDirectLighting.frag");
+					material->LoadShaderProgram(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRDirectLighting.frag");
 				}
 
 				// Display FPS
@@ -222,11 +222,11 @@ int main(int argc, char* argv[])
 
 				// We've finished adding stuff to the window
 				ImGui::End();
-			}
 
-			// Render GUI to screen
-			ImGui::Render();
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+				// Render GUI to screen
+				ImGui::Render();
+				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			}
 
 			context.DisplayFrame();	
 		}

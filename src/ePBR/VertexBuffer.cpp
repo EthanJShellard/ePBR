@@ -85,7 +85,7 @@ namespace ePBR
 		m_dirty = true;
 	}
 
-	void VertexBuffer::Add(GLfloat _value)
+	void VertexBuffer::Add(float _value)
 	{
 		if (m_numComponents != 1 && m_numComponents != 0) throw std::runtime_error("Incorrect number of components in attempt to add to vertex buffer!");;
 

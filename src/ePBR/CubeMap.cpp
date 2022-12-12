@@ -8,19 +8,9 @@
 
 namespace ePBR 
 {
-	GLuint CubeMap::GetMapID() 
+	GLuint CubeMap::GetMapID() const 
 	{
 		return m_mapID;
-	}
-
-	GLuint CubeMap::GetFramebufferID() 
-	{
-		return m_frameBufferID;
-	}
-
-	GLuint CubeMap::GetRenderbufferID() 
-	{
-		return m_renderBufferID;
 	}
 
 	CubeMap::CubeMap() :
