@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 		material->SetMetalnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_metallic.png");
 		material->SetNormalMap(pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
 		material->SetRoughnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
-		material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBR.frag");
+		material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
 
 		
 		std::shared_ptr<ePBR::CubeMap> cubeMap1, convolutedCubeMap1, prefilterEnvMap1;
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
 		std::shared_ptr<ePBR::Mesh> modelMesh = std::make_shared<ePBR::Mesh>();
 		//// Load from OBJ file. This must have triangulated geometry
 		modelMesh->LoadOBJ(pwd + "data\\models\\sphere\\triangulated.obj");
-		//modelMesh->SetAsQuad(0.5f, 0.5f);
+		//modelMesh->SetAsCube(0.5f);
 		//material->SetAlbedoTexture(brdfLUT);
 
 		// Set up model
@@ -77,6 +77,7 @@ int main(int argc, char* argv[])
 		// Controls
 		bool cmdRotateDown(false), cmdRotateUp(false), cmdRotateLeft(false), cmdRotateRight(false);
 		float cameraAngleX(0), cameraAngleY(0);
+		bool IBLShader = true;
 
 		// Timing
 		unsigned int lastTime = SDL_GetTicks();
@@ -112,7 +113,17 @@ int main(int argc, char* argv[])
 						cmdRotateRight = true;
 						break;
 					case SDLK_SPACE:
-						material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBR.frag");
+						if (IBLShader) 
+						{
+							IBLShader = !IBLShader;
+							material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRDirectLighting.frag");
+						}
+						else
+						{
+							IBLShader = !IBLShader;
+							material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
+						}
+						
 						break;
 					}
 					break;
