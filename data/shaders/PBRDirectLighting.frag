@@ -148,22 +148,19 @@ void main()
     {
         vec3 lightDir = normalize(lightPositions[i] - positionV);
         vec3 halfVec = normalize(viewDir + lightDir);
-        float NDotH = max(dot(normal, viewDir), 0.0);
-        float NDotV = max(dot(halfVec, viewDir), 0.0);
-        float NDotL = max(dot(normal, lightDir), 0.0);
 
         float distance = length(lightPositions[i] - positionV);
         float attenuation = 5.0 / (distance * distance);
         vec3 radiance = lightColours[i] * attenuation;
 
         // Calculate fresnel
-        vec3 F = fresnelSchlick(NDotV, F0);
+        vec3 F = fresnelSchlick(max(dot(halfVec, viewDir), 0.0), F0);
 
          // Calculate geometry occlusion
         float G = GeometrySmith(normal, viewDir, lightDir, texRoughness);
          // Calculate normal distribution
-        //float NDF = DistributionGGX(normal, halfVec, texRoughness);
-        float NDF = BeckmannDistribution(NDotH, roughness);
+        float NDF = DistributionGGX(normal, halfVec, texRoughness);
+        //float NDF = BeckmannDistribution(max(dot(normal, halfVec), 0.0), texRoughness);
 
         // Fresnel corrensponds to kS (the energy of light that gets reflected)
         vec3 kS = F;
@@ -173,11 +170,12 @@ void main()
 
         // Calculate Cook-Torrance BRDF
         vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * NDotV * NDotL + 0.0001; // + 0.0001 to prevent divide by zero
+        float denominator = 4.0 * max(dot(normal, viewDir), 0.0) * max(dot(normal, lightDir), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
         vec3 specular = numerator / denominator;
 
         // Calculate outgoing reflectance value
-        Lo += (kD * texAlbedo / PI + specular) * radiance * NDotL;
+        float nDotL = max(dot(normal, lightDir), 0.0);
+        Lo += (kD * texAlbedo / PI + specular) * radiance * nDotL;
     }
 
     // Fake ambient

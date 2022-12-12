@@ -2,6 +2,9 @@
 
 #include <glm/ext.hpp>
 
+#include <imgui/imgui_impl_sdl.h>
+#include <imgui/imgui_impl_opengl3.h>
+
 #include <stdexcept>
 #include <iostream>
 
@@ -77,7 +80,9 @@ int main(int argc, char* argv[])
 		// Controls
 		bool cmdRotateDown(false), cmdRotateUp(false), cmdRotateLeft(false), cmdRotateRight(false);
 		float cameraAngleX(0), cameraAngleY(0);
-		bool IBLShader = true;
+		bool useIBLShader = true;
+		bool showIMGUI = true;
+		bool currentScene = true;
 
 		// Timing
 		unsigned int lastTime = SDL_GetTicks();
@@ -88,6 +93,9 @@ int main(int argc, char* argv[])
 			SDL_Event incomingEvent;
 			while (SDL_PollEvent(&incomingEvent))
 			{
+				// Let our GUI system handle some events
+				ImGui_ImplSDL2_ProcessEvent(&incomingEvent);
+
 				switch (incomingEvent.type)
 				{
 				case SDL_QUIT:
@@ -112,19 +120,6 @@ int main(int argc, char* argv[])
 					case SDLK_RIGHT:
 						cmdRotateRight = true;
 						break;
-					case SDLK_SPACE:
-						if (IBLShader) 
-						{
-							IBLShader = !IBLShader;
-							material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRDirectLighting.frag");
-						}
-						else
-						{
-							IBLShader = !IBLShader;
-							material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
-						}
-						
-						break;
 					}
 					break;
 
@@ -146,15 +141,6 @@ int main(int argc, char* argv[])
 					case SDLK_RIGHT:
 						cmdRotateRight = false;
 						break;
-					case SDLK_1:
-						material->SetEnvironmentMap(convolutedCubeMap1);
-						material->SetPrefilterEnvironmentMap(prefilterEnvMap1);
-						selectedSkybox = cubeMap1;
-						break;
-					case SDLK_2:
-						material->SetEnvironmentMap(convolutedCubeMap2);
-						material->SetPrefilterEnvironmentMap(prefilterEnvMap2);
-						selectedSkybox = cubeMap2;
 					}
 					break;
 				}
@@ -185,6 +171,68 @@ int main(int argc, char* argv[])
 			renderer.Draw();
 
 			context.RenderSkyBox(selectedSkybox, viewMatrix, projectionMatrix);
+
+			// Start the Dear ImGui frame
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplSDL2_NewFrame();
+			ImGui::NewFrame();
+
+			if (showIMGUI)
+			{
+				// Create a window, give it a name
+				// All ImGui commands after this to create widgets will be added to the window
+				ImGui::Begin("Controls", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+
+				// This is how you add a bit of text to the window
+				ImGui::Text("Arrow keys rotate the camera");
+
+				// Scene switching
+				if (ImGui::Button("Switch scene")) 
+				{
+					if (currentScene) 
+					{
+						material->SetEnvironmentMap(convolutedCubeMap2);
+						material->SetPrefilterEnvironmentMap(prefilterEnvMap2);
+						selectedSkybox = cubeMap2;
+						currentScene = !currentScene;
+					}
+					else 
+					{
+						material->SetEnvironmentMap(convolutedCubeMap1);
+						material->SetPrefilterEnvironmentMap(prefilterEnvMap1);
+						selectedSkybox = cubeMap1;
+						currentScene = !currentScene;
+					}
+				}
+
+				// Shader switching
+				if (ImGui::Button("Use IBL only shader")) 
+				{
+					if (!useIBLShader)
+					{
+						useIBLShader = !useIBLShader;
+						material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
+					}
+				}
+				if (ImGui::Button("Use direct lighting only shader")) 
+				{
+					if (useIBLShader)
+					{
+						useIBLShader = !useIBLShader;
+						material->LoadShaders(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRDirectLighting.frag");
+					}
+				}
+
+				// Display FPS
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+				// We've finished adding stuff to the window
+				ImGui::End();
+			}
+
+			// Render GUI to screen
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 			context.DisplayFrame();	
 		}
