@@ -66,7 +66,7 @@ namespace ePBR
 		// You can experiment with the numbers to see what they do
 		int winPosX = 10;
 		int winPosY = 10;
-		m_window = SDL_CreateWindow("My Window!!!",  // The first parameter is the window title
+		m_window = SDL_CreateWindow("ePBR",  // The first parameter is the window title
 			winPosX, winPosY,
 			m_windowWidth, m_windowHeight,
 			SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);

@@ -16,7 +16,7 @@ namespace ePBR
 		{
 			glBindVertexArray(m_id);
 
-			for (size_t i = 0; i < m_buffers.size(); i++)
+			for (unsigned int i = 0; i < m_buffers.size(); i++)
 			{
 				if (!m_buffers.at(i)) continue; //If null go to next
 
