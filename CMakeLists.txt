@@ -54,6 +54,9 @@ add_library(ePBR
     src/ePBR/CubeMap.h
     src/ePBR/CubeMap.cpp
     src/ePBR/ePBR.h
+    src/ePBR/LegacyMaterial.h
+    src/ePBR/LegacyMaterial.cpp
+    src/ePBR/Material.h
 )
 
 add_executable(demo

@@ -68,16 +68,29 @@ int main(int argc, char* argv[])
 
 		std::shared_ptr<ePBR::Texture> brdfLUT = context.GetBRDFLookupTexture();
 
-		// Test PBR Material
+		// Load textures
 		std::shared_ptr<ePBR::PBRMaterial> globalMaterial = std::make_shared<ePBR::PBRMaterial>();
-		globalMaterial->SetAlbedoTexture(pwd + "data\\textures\\rustediron2\\rustediron2_basecolor.png");
-		globalMaterial->SetMetalnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_metallic.png");
-		globalMaterial->SetNormalMap(pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
-		globalMaterial->SetRoughnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
+		auto albedoTex = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\rustediron2\\rustediron2_basecolor.png");
+		auto metalnessTex = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\rustediron2\\rustediron2_metallic.png");
+		auto normalMap = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
+		auto roughnessTex = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
+
+		// Test PBR Material
+		globalMaterial->SetAlbedoTexture(albedoTex);
+		globalMaterial->SetMetalnessMap(metalnessTex);
+		globalMaterial->SetNormalMap(normalMap);
+		globalMaterial->SetRoughnessMap(roughnessTex);
 		globalMaterial->SetShader(IBLOnlyShader);
 		globalMaterial->SetIrradianceMap(convolutedCubeMap1);
 		globalMaterial->SetPrefilterEnvironmentMap(prefilterEnvMap1);
 		globalMaterial->SetBRDFLookupTexture(brdfLUT);
+
+		// Test legacy material
+		std::shared_ptr<ePBR::LegacyMaterial> legacyMaterial = std::make_shared<ePBR::LegacyMaterial>();
+		legacyMaterial->SetAlbedoTexture(albedoTex);
+		legacyMaterial->SetNormalMap(normalMap);
+		legacyMaterial->SetShininess(50.0f);
+		legacyMaterial->SetShader(blinnPhongShader);
 
 		// Set up mesh
 		std::shared_ptr<ePBR::Mesh> modelMesh = std::make_shared<ePBR::Mesh>();
@@ -86,7 +99,7 @@ int main(int argc, char* argv[])
 		// Set up model
 		std::shared_ptr<ePBR::Model> testModel = std::make_shared<ePBR::Model>();
 		testModel->SetMesh(0, modelMesh);
-		testModel->SetMaterial(0, globalMaterial);
+		testModel->SetMaterial(0, legacyMaterial);
 
 		// Set up scenes
 		Scene arrayOfSpheresScene;
