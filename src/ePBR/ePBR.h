@@ -4,6 +4,8 @@
 #include "Context.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "Material.h"
+#include "LegacyMaterial.h"
 #include "PBRMaterial.h"
 #include "Renderer.h"
 #include "RenderTexture.h"

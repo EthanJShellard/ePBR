@@ -9,14 +9,14 @@
 
 namespace ePBR 
 {
-	class PBRMaterial;
+	class Material;
 	class Mesh;
 
 	class Model 
 	{
 	private:
 		std::vector<std::shared_ptr<Mesh>> m_meshes;
-		std::vector<std::shared_ptr<PBRMaterial>> m_materials;
+		std::vector<std::shared_ptr<Material>> m_materials;
 
 	public:
 		/// @brief Get this Model's meshes.
@@ -25,12 +25,12 @@ namespace ePBR
 
 		/// @brief Get this Model's materials.
 		/// @return A vector containing this Model's materials.
-		std::vector<std::shared_ptr<PBRMaterial>> GetMaterials() { return m_materials; }
+		std::vector<std::shared_ptr<Material>> GetMaterials() { return m_materials; }
 
 		/// @brief Set a material at a specified index on this Model.
 		/// @param _index The index of the material to be set.
 		/// @param _newMat The new material.
-		void SetMaterial(int _index, std::shared_ptr<PBRMaterial> _newMat);
+		void SetMaterial(int _index, std::shared_ptr<Material> _newMat);
 
 		/// @brief Set a Mesh at a specified index on this Model.
 		/// @param _index The index of the Mesh to be set.

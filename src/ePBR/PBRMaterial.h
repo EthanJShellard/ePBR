@@ -2,6 +2,7 @@
 #define EPBR_PBR_MATERIAL
 
 #include "Texture.h"
+#include "Material.h"
 
 #include <string>
 #include <memory>
@@ -15,7 +16,7 @@ namespace ePBR
 	class Shader;
 	class CubeMap;
 
-	class PBRMaterial
+	class PBRMaterial : public Material
 	{
 	public:
 		PBRMaterial();

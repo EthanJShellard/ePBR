@@ -22,7 +22,8 @@ uniform float alpha         = 1.0f;
 
 
 // This is another input to allow us to access a texture
-uniform sampler2D tex1;
+uniform sampler2D albedoMap;
+uniform sampler2D normalMap;
 
 // This is the output, it is the fragment's (pixel's) colour
 out vec4 fragColour;
@@ -45,8 +46,8 @@ void main()
 		vec3 diffuse = texCol * ( ambientColour + max(0,dot(normal,lightDir)) );
 		
 		
-		// This is where you need to write your code!
-		vec3 specular = vec3(0);
+		// Blinn-Phong specular
+    	vec3 specular = specularColour * pow(max(dot(halfVec, normal), 0.0), shininess);
 		
 		// The final output colour is the emissive + ambient + diffuse + specular
 		// Removed emissive from output as it is breaking everything

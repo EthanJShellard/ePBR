@@ -2,6 +2,8 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "Mesh.h"
+#include "Material.h"
+#include "Texture.h"
 #include "PBRMaterial.h"
 
 #include <fstream>
@@ -44,7 +46,7 @@ namespace ePBR
 		}
 	}
 
-	void Model::SetMaterial(int _index, std::shared_ptr<PBRMaterial> _newMat) 
+	void Model::SetMaterial(int _index, std::shared_ptr<Material> _newMat) 
 	{
 		if (m_materials.size() < _index + 1) 
 		{

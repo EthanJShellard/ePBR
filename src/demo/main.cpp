@@ -39,11 +39,12 @@ int main(int argc, char* argv[])
 		glm::vec3 camPos(0);
 
 		// Load Shaders
-		std::shared_ptr<ePBR::Shader> comboPBRShader, IBLOnlyShader, directLightingOnlyShader, noSamplersShader;
+		std::shared_ptr<ePBR::Shader> comboPBRShader, IBLOnlyShader, directLightingOnlyShader, noSamplersShader, blinnPhongShader;
 		comboPBRShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBR.frag");
 		IBLOnlyShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
 		directLightingOnlyShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRDirectLighting.frag");
 		noSamplersShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRNoSamplers.frag");
+		blinnPhongShader = std::make_shared<ePBR::Shader>(pwd + "data/shaders/BlinnPhong.vert", pwd + "data/shaders/BlinnPhong.frag");
 
 		// Get first equirectangular map and generate cubemap
 		std::shared_ptr<ePBR::CubeMap> cubeMap1, convolutedCubeMap1, prefilterEnvMap1;
@@ -240,8 +241,12 @@ int main(int argc, char* argv[])
 					{
 						for (auto model : currentScene->models) 
 						{
-							model->GetMaterials()[0]->SetIrradianceMap(convolutedCubeMap2);
-							model->GetMaterials()[0]->SetPrefilterEnvironmentMap(prefilterEnvMap2);
+							std::shared_ptr<ePBR::PBRMaterial> mat = std::dynamic_pointer_cast<ePBR::PBRMaterial>(model->GetMaterials()[0]);
+							if (mat) 
+							{
+								mat->SetIrradianceMap(convolutedCubeMap2);
+								mat->SetPrefilterEnvironmentMap(prefilterEnvMap2);
+							}
 						}
 						selectedSkybox = cubeMap2;
 						isDayEnvironment = !isDayEnvironment;
@@ -250,8 +255,12 @@ int main(int argc, char* argv[])
 					{
 						for (auto model : currentScene->models)
 						{
-							model->GetMaterials()[0]->SetIrradianceMap(convolutedCubeMap1);
-							model->GetMaterials()[0]->SetPrefilterEnvironmentMap(prefilterEnvMap1);
+							std::shared_ptr<ePBR::PBRMaterial> mat = std::dynamic_pointer_cast<ePBR::PBRMaterial>(model->GetMaterials()[0]);
+							if (mat) 
+							{
+								mat->SetIrradianceMap(convolutedCubeMap1);
+								mat->SetPrefilterEnvironmentMap(prefilterEnvMap1);
+							}
 						}
 						selectedSkybox = cubeMap1;
 						isDayEnvironment = !isDayEnvironment;

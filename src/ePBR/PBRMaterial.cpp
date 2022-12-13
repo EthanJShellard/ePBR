@@ -81,7 +81,7 @@ namespace ePBR
 		m_shaderProgram = _newShader;
 
 		// Calling GetID will compile and link the newly created shader program
-		GLint id = m_shaderProgram->GetID();
+		GLuint id = m_shaderProgram->GetID();
 
 		glUseProgram(id);
 
