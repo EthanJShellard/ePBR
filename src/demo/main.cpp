@@ -257,6 +257,13 @@ int main(int argc, char* argv[])
 					}
 				}
 
+				// Switch objects
+				bool inArrayScene = currentScene == &arrayOfSpheresScene;
+				if (ImGui::Button(inArrayScene ? "Switch to single sphere" : "Switch to array of spheres")) 
+				{
+					currentScene = inArrayScene ? &singleSphereScene : &arrayOfSpheresScene;
+				}
+
 				// Disable sampling
 				if (ImGui::Button(textureSamplingDisbabled ? "Enable texture sampling" : "Disable texure sampling")) 
 				{
