@@ -190,6 +190,9 @@ int main(int argc, char* argv[])
 			// Clear render target
 			renderer.Clear();
 
+			// Draw skybox before anything else
+			context.RenderSkyBox(selectedSkybox, viewMatrix, projectionMatrix);
+
 			// Timing
 			unsigned int currentTime = SDL_GetTicks();
 			float deltaTime = (float)(currentTime - lastTime) / 1000.0f;
@@ -215,8 +218,6 @@ int main(int argc, char* argv[])
 				renderer.SetModel(currentScene->models[i]);
 				renderer.Draw();
 			}
-
-			context.RenderSkyBox(selectedSkybox, viewMatrix, projectionMatrix);
 
 			if (showIMGUI)
 			{

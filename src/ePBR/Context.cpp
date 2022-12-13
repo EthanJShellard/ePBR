@@ -198,8 +198,7 @@ namespace ePBR
 		glUniformMatrix4fv(m_skyboxViewPos, 1, false, glm::value_ptr(_viewMat));
 
 		// Ensure that we draw behind everything else!
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_EQUAL);
+		glDisable(GL_DEPTH_TEST);
 
 		m_unitCube->Draw();
 	}
