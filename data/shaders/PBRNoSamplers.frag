@@ -1,7 +1,5 @@
 #version 430 core
 
-// TESTING BRDF with point lighting. IBL to come.
-
 // These are the per-fragment inputs
 // They must match with the outputs of the vertex shader
 in vec3 positionV;
@@ -16,17 +14,7 @@ uniform vec3 camPos;
 uniform vec3 albedo;
 uniform float metalness;
 uniform float roughness;
-uniform float ambientOcclusion;
-
-// This is another input to allow us to access a texture
-layout(location = 0) uniform sampler2D albedoMap;
-layout(location = 1) uniform sampler2D normalMap;
-layout(location = 2) uniform sampler2D metalnessMap;
-layout(location = 3) uniform sampler2D roughnessMap;
-layout(location = 4) uniform sampler2D ambientOcclusionMap;
-layout(location = 5) uniform samplerCube irradianceMap;
-layout(location = 6) uniform samplerCube prefilterMap;
-layout(location = 7) uniform sampler2D brdfLUT;
+uniform vec3 ambient;
 
 // This is the output, it is the fragment's (pixel's) colour
 out vec4 fragColour;
@@ -99,31 +87,17 @@ float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 void main()
 {
     vec3 viewDir = normalize(camPos - positionV);
-
-    // Sample albedo
-    vec3 texAlbedo = vec3(texture(albedoMap,vec2(texCoordV.x,1-texCoordV.y)));
-
-    //vec3 normal = normalize(normalV);
-    // Use TBN to transform tangent space normals
-    vec3 normal = vec3(texture(normalMap, vec2(texCoordV.x, texCoordV.y)));
-    normal = normal * 2.0 - 1.0;
-    normal = normalize(TBN * normal);
-
-    // Sample metalness
-    float texMetalness = texture(metalnessMap, vec2(texCoordV.x, texCoordV.y)).x;
-
-    // Sample roughness
-    float texRoughness = texture(roughnessMap, vec2(texCoordV.x, texCoordV.y)).x;
+    vec3 normal = normalize(normalV);
 
     // Need surface reflection at zero incidence (from directly above)
     // We approximate dielectrics to 0.04 and interpolate based on metalness.
     vec3 F0 = vec3(0.04);
-    F0 = mix(F0, texAlbedo, texMetalness);
+    F0 = mix(F0, albedo, metalness);
 
     // Test 4 set lights
     vec3 lightPositions[1] = vec3[1]
     (
-        vec3(0.0, 1, 3.0)//,
+        vec3(0.4, 0.4, 0.4)//,
         //vec3( 0, 0.5, 3.0),
         //vec3( 3.0, 0.5, 0),
         //vec3( 0, 0.5, -3.0)
@@ -140,10 +114,10 @@ void main()
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < 1; i++)
     {
-        vec3 lightDir = normalize(lightPositions[i] - positionV);
+        vec3 lightDir = normalize(lightPositions[i]);
         vec3 halfVec = normalize(viewDir + lightDir);
 
-        float distance = length(lightPositions[i] - positionV);
+        float distance = length(lightPositions[i]);
         float attenuation = 5.0 / (distance * distance);
         vec3 radiance = lightColours[i] * attenuation;
 
@@ -151,16 +125,16 @@ void main()
         vec3 F = fresnelSchlick(max(dot(halfVec, viewDir), 0.0), F0);
 
          // Calculate geometry occlusion
-        float G = GeometrySmith(normal, viewDir, lightDir, texRoughness);
+        float G = GeometrySmith(normal, viewDir, lightDir, roughness);
          // Calculate normal distribution
-        float NDF = DistributionGGX(normal, halfVec, texRoughness);
-        //float NDF = BeckmannDistribution(max(dot(normal, halfVec), 0.0), texRoughness);
+        float NDF = DistributionGGX(normal, halfVec, roughness);
+        //float NDF = BeckmannDistribution(max(dot(normal, halfVec), 0.0), roughness);
 
         // Fresnel corrensponds to kS (the energy of light that gets reflected)
         vec3 kS = F;
         // Ratio of refraction (remaining after reflection)
-        vec3 kD = vec3(1.0) - kS; 
-        kD *= 1.0 - texMetalness;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metalness;
 
         // Calculate Cook-Torrance BRDF
         vec3 numerator = NDF * G * F;
@@ -169,11 +143,8 @@ void main()
 
         // Calculate outgoing reflectance value
         float nDotL = max(dot(normal, lightDir), 0.0);
-        Lo += (kD * texAlbedo / PI + specular) * radiance * nDotL;
+        Lo += (kD * albedo / PI + specular) * radiance * nDotL;
     }
-
-    // Fake ambient
-    vec3 ambient = vec3(0.001) * texAlbedo/* * ao*/;
 
     // Final lit colour
     vec3 colour = ambient + Lo;

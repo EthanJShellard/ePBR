@@ -8,6 +8,13 @@
 #include <stdexcept>
 #include <iostream>
 
+struct Scene
+{
+	std::vector<std::shared_ptr<ePBR::Model>> models;
+	std::vector<glm::vec3> modelPositions;
+	float cameraDistance;
+};
+
 int main(int argc, char* argv[])
 {
 	try 
@@ -28,18 +35,17 @@ int main(int argc, char* argv[])
 		ePBR::Renderer renderer(context.GetWindowWidth(), context.GetWindowHeight());
 		renderer.SetFlagCullBackfaces(false);
 		renderer.SetFlagDepthTest(true);
+		SDL_GL_SetSwapInterval(0); // Disable vsync
 		glm::vec3 camPos(0);
 
-		// Test PBR Material
-		std::shared_ptr<ePBR::PBRMaterial> material = std::make_shared<ePBR::PBRMaterial>();
-		material->SetAlbedoTexture(pwd + "data\\textures\\rustediron2\\rustediron2_basecolor.png");
+		// Load Shaders
+		std::shared_ptr<ePBR::Shader> comboPBRShader, IBLOnlyShader, directLightingOnlyShader, noSamplersShader;
+		comboPBRShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBR.frag");
+		IBLOnlyShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
+		directLightingOnlyShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRDirectLighting.frag");
+		noSamplersShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRNoSamplers.frag");
 
-		material->SetMetalnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_metallic.png");
-		material->SetNormalMap(pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
-		material->SetRoughnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
-		material->LoadShaderProgram(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
-
-		
+		// Get first equirectangular map and generate cubemap
 		std::shared_ptr<ePBR::CubeMap> cubeMap1, convolutedCubeMap1, prefilterEnvMap1;
 		{
 			std::shared_ptr<ePBR::Texture> equirectangularMap1 = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\EnvironmentMaps\\HDR_029_Sky_Cloudy_Ref.hdr", true);
@@ -61,28 +67,63 @@ int main(int argc, char* argv[])
 
 		std::shared_ptr<ePBR::Texture> brdfLUT = context.GetBRDFLookupTexture();
 
-		material->SetIrradianceMap(convolutedCubeMap1);
-		material->SetPrefilterEnvironmentMap(prefilterEnvMap1);
-		material->SetBRDFLookupTexture(brdfLUT);
+		// Test PBR Material
+		std::shared_ptr<ePBR::PBRMaterial> globalMaterial = std::make_shared<ePBR::PBRMaterial>();
+		globalMaterial->SetAlbedoTexture(pwd + "data\\textures\\rustediron2\\rustediron2_basecolor.png");
+		globalMaterial->SetMetalnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_metallic.png");
+		globalMaterial->SetNormalMap(pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
+		globalMaterial->SetRoughnessMap(pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
+		globalMaterial->SetShader(IBLOnlyShader);
+		globalMaterial->SetIrradianceMap(convolutedCubeMap1);
+		globalMaterial->SetPrefilterEnvironmentMap(prefilterEnvMap1);
+		globalMaterial->SetBRDFLookupTexture(brdfLUT);
 
-		// The mesh is the geometry for the object
+		// Set up mesh
 		std::shared_ptr<ePBR::Mesh> modelMesh = std::make_shared<ePBR::Mesh>();
-		//// Load from OBJ file. This must have triangulated geometry
 		modelMesh->LoadOBJ(pwd + "data\\models\\sphere\\triangulated.obj");
-		//modelMesh->SetAsCube(0.5f);
-		//material->SetAlbedoTexture(brdfLUT);
 
 		// Set up model
 		std::shared_ptr<ePBR::Model> testModel = std::make_shared<ePBR::Model>();
 		testModel->SetMesh(0, modelMesh);
-		testModel->SetMaterial(0, material);
+		testModel->SetMaterial(0, globalMaterial);
+
+		// Set up scenes
+		Scene arrayOfSpheresScene;
+		arrayOfSpheresScene.cameraDistance = 7.0f;
+		int sphereSpacing(1.85f);
+		for (int x = 0; x < 5; x++) 
+		{
+			for (int y = 0; y < 5; y++) 
+			{
+				std::shared_ptr<ePBR::PBRMaterial> mat = std::make_shared<ePBR::PBRMaterial>();
+				std::shared_ptr<ePBR::Model> model = std::make_shared<ePBR::Model>();
+				* mat = * globalMaterial;
+				*model = *testModel;
+
+				mat->SetAlbedo(glm::vec3(1.0f, 0.0f, 0.0f));
+				mat->SetMetalness(0.95f - (x / 5.0f));
+				mat->SetRoughness((y / 5.0f) + 0.05f);
+				model->SetMaterial(0, mat);
+
+				arrayOfSpheresScene.models.push_back(model);
+				arrayOfSpheresScene.modelPositions.push_back(glm::vec3( ((-2 * sphereSpacing) + (sphereSpacing * x)), ((-2 * sphereSpacing) + (sphereSpacing * y)), 0.0f ));
+			}
+		}
+
+		Scene singleSphereScene;
+		singleSphereScene.models.assign(1, testModel);
+		singleSphereScene.cameraDistance = (2.0f);
+		singleSphereScene.modelPositions.push_back(glm::vec3(0.0f));
 
 		// Controls
 		bool cmdRotateDown(false), cmdRotateUp(false), cmdRotateLeft(false), cmdRotateRight(false);
 		float cameraAngleX(0), cameraAngleY(0);
 		bool useIBLShader = true;
 		bool showIMGUI = true;
-		bool currentScene = true;
+		bool isDayEnvironment = true;
+		bool textureSamplingDisbabled = false;
+
+		Scene* currentScene = textureSamplingDisbabled ? &arrayOfSpheresScene : &singleSphereScene;
 
 		// Timing
 		unsigned int lastTime = SDL_GetTicks();
@@ -146,6 +187,9 @@ int main(int argc, char* argv[])
 				}
 			}
 
+			// Clear render target
+			renderer.Clear();
+
 			// Timing
 			unsigned int currentTime = SDL_GetTicks();
 			float deltaTime = (float)(currentTime - lastTime) / 1000.0f;
@@ -157,18 +201,20 @@ int main(int argc, char* argv[])
 			cameraAngleX += cmdRotateDown ? -1.0f * deltaTime : 0.0f;
 			cameraAngleX += cmdRotateUp ? 1.0f * deltaTime : 0.0f;
 
-			modelMatrix = glm::rotate(modelMatrix, deltaTime * 1, glm::vec3(0, 1.0f, 0));
-
 			// Construct view matrix
-			viewMatrix = glm::rotate(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5f, -2.0f)), cameraAngleX, glm::vec3(1, 0, 0)), cameraAngleY, glm::vec3(0, 1, 0));
+			viewMatrix = glm::rotate(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5f, -currentScene->cameraDistance)), cameraAngleX, glm::vec3(1, 0, 0)), cameraAngleY, glm::vec3(0, 1, 0));
 			camPos = glm::inverse(viewMatrix) * glm::mat4(1) * glm::vec4(0, 0, 0, 1);
 
-			renderer.Clear();
-
-			renderer.SetMatrices(modelMatrix, viewMatrix, projectionMatrix);
+			// Render scene
 			renderer.SetCamPos(camPos);
-			renderer.SetModel(testModel);
-			renderer.Draw();
+
+			for (int i = 0; i < currentScene->models.size(); i++) 
+			{
+				modelMatrix = glm::translate(glm::mat4(1), currentScene->modelPositions[i]);
+				renderer.SetMatrices(modelMatrix, viewMatrix, projectionMatrix);
+				renderer.SetModel(currentScene->models[i]);
+				renderer.Draw();
+			}
 
 			context.RenderSkyBox(selectedSkybox, viewMatrix, projectionMatrix);
 
@@ -187,34 +233,58 @@ int main(int argc, char* argv[])
 				ImGui::Text("Arrow keys rotate the camera");
 
 				// Scene switching
-				if (ImGui::Button("Switch scene")) 
+				if (ImGui::Button("Switch scene"))
 				{
-					if (currentScene) 
+					if (isDayEnvironment)
 					{
-						material->SetIrradianceMap(convolutedCubeMap2);
-						material->SetPrefilterEnvironmentMap(prefilterEnvMap2);
+						for (auto model : currentScene->models) 
+						{
+							model->GetMaterials()[0]->SetIrradianceMap(convolutedCubeMap2);
+							model->GetMaterials()[0]->SetPrefilterEnvironmentMap(prefilterEnvMap2);
+						}
 						selectedSkybox = cubeMap2;
-						currentScene = !currentScene;
+						isDayEnvironment = !isDayEnvironment;
 					}
-					else 
+					else
 					{
-						material->SetIrradianceMap(convolutedCubeMap1);
-						material->SetPrefilterEnvironmentMap(prefilterEnvMap1);
+						for (auto model : currentScene->models)
+						{
+							model->GetMaterials()[0]->SetIrradianceMap(convolutedCubeMap1);
+							model->GetMaterials()[0]->SetPrefilterEnvironmentMap(prefilterEnvMap1);
+						}
 						selectedSkybox = cubeMap1;
-						currentScene = !currentScene;
+						isDayEnvironment = !isDayEnvironment;
 					}
 				}
 
+				// Disable sampling
+				if (ImGui::Button(textureSamplingDisbabled ? "Enable texture sampling" : "Disable texure sampling")) 
+				{
+					for (auto model : currentScene->models)
+					{
+						model->GetMaterials()[0]->SetShader(textureSamplingDisbabled ? (useIBLShader ? IBLOnlyShader : directLightingOnlyShader) : noSamplersShader);
+					}
+					textureSamplingDisbabled = !textureSamplingDisbabled;
+				}
+
 				// Shader switching
-				if (ImGui::Button( useIBLShader ? "Reload IBL only shader (current)" : "Use IBL only shader")) 
+				if (ImGui::Button("Use IBL only shader"))
 				{
 					useIBLShader = true;
-					material->LoadShaderProgram(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
+					textureSamplingDisbabled = false;
+					for (auto model : currentScene->models)
+					{
+						model->GetMaterials()[0]->SetShader(IBLOnlyShader);
+					}
 				}
-				if (ImGui::Button(!useIBLShader ? "Reload direct lighting only shader (current)" : "Use direct lighting only shader")) 
+				if (ImGui::Button("Use direct lighting only shader"))
 				{
 					useIBLShader = false;
-					material->LoadShaderProgram(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRDirectLighting.frag");
+					textureSamplingDisbabled = false;
+					for (auto model : currentScene->models)
+					{
+						model->GetMaterials()[0]->SetShader(directLightingOnlyShader);
+					}
 				}
 
 				// Display FPS

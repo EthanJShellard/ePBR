@@ -29,8 +29,8 @@ void main()
     texCoordV = vTexCoordIn;
 
     // Interpolated normal
-    normalV = vec3(modelMat * vec4(vNormalIn, 1));
     positionV = vec3(modelMat * vec4(vPositionIn, 1));
+    normalV = vec3(mat3(modelMat) * vNormalIn);
 
     // Calculate TBN matrix for normal mapping
     vec3 T = normalize(vec3(modelMat * vec4(vTangentIn, 0.0)));
