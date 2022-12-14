@@ -153,11 +153,11 @@ int main(int argc, char* argv[])
 		bool cmdRotateDown(false), cmdRotateUp(false), cmdRotateLeft(false), cmdRotateRight(false);
 		float cameraAngleX(0), cameraAngleY(0);
 		bool useIBLShader = true;
-		bool showIMGUI = false;
+		bool showIMGUI = true;
 		bool isDayEnvironment = true;
 		bool textureSamplingDisbabled = false;
 
-		Scene* currentScene = &arrayOfSpheresScene;//textureSamplingDisbabled ? &arrayOfSpheresScene : &singleSphereScene;
+		Scene* currentScene = &singleSphereScene;//textureSamplingDisbabled ? &arrayOfSpheresScene : &singleSphereScene;
 
 		// Timing
 		uint64_t lastTime = SDL_GetTicks();
