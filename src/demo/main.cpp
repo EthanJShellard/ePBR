@@ -7,6 +7,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <chrono>
 
 struct Scene
 {
@@ -119,15 +120,16 @@ int main(int argc, char* argv[])
 			{
 				std::shared_ptr<ePBR::PBRMaterial> mat = std::make_shared<ePBR::PBRMaterial>();
 				std::shared_ptr<ePBR::Model> model = std::make_shared<ePBR::Model>();
-				* mat = * IBLMaterial;
-				*model = *testModel;
+				//* mat = * IBLMaterial;
+				//*model = *testModel;
 
-				mat->SetAlbedo(glm::vec3(1.0f, 0.0f, 0.0f));
-				mat->SetMetalness(0.95f - (x / 5.0f));
-				mat->SetRoughness((y / 5.0f) + 0.05f);
-				model->SetMaterial(0, mat);
+				//mat->SetAlbedo(glm::vec3(1.0f, 0.0f, 0.0f));
+				//mat->SetMetalness(0.95f - (x / 5.0f));
+				//mat->SetRoughness((y / 5.0f) + 0.05f);
+				//model->SetMaterial(0, mat);
 
-				arrayOfSpheresScene.models.push_back(model);
+				//arrayOfSpheresScene.models.push_back(model);
+				arrayOfSpheresScene.models.push_back(testModel);
 				arrayOfSpheresScene.modelPositions.push_back(glm::vec3( ((-2 * sphereSpacing) + (sphereSpacing * x)), ((-2 * sphereSpacing) + (sphereSpacing * y)), 0.0f ));
 			}
 		}
@@ -151,14 +153,16 @@ int main(int argc, char* argv[])
 		bool cmdRotateDown(false), cmdRotateUp(false), cmdRotateLeft(false), cmdRotateRight(false);
 		float cameraAngleX(0), cameraAngleY(0);
 		bool useIBLShader = true;
-		bool showIMGUI = true;
+		bool showIMGUI = false;
 		bool isDayEnvironment = true;
 		bool textureSamplingDisbabled = false;
 
-		Scene* currentScene = &modelComparisonScene;//textureSamplingDisbabled ? &arrayOfSpheresScene : &singleSphereScene;
+		Scene* currentScene = &arrayOfSpheresScene;//textureSamplingDisbabled ? &arrayOfSpheresScene : &singleSphereScene;
 
 		// Timing
-		unsigned int lastTime = SDL_GetTicks();
+		uint64_t lastTime = SDL_GetTicks();
+		std::chrono::time_point<std::chrono::system_clock> beginTP = std::chrono::system_clock::now();
+		uint64_t numTicks = 0;
 
 		bool running = true;
 		while (running) 
@@ -226,8 +230,9 @@ int main(int argc, char* argv[])
 			context.RenderSkyBox(selectedSkybox, viewMatrix, projectionMatrix);
 
 			// Timing
-			unsigned int currentTime = SDL_GetTicks();
+			uint64_t currentTime = SDL_GetTicks();
 			float deltaTime = (float)(currentTime - lastTime) / 1000.0f;
+			numTicks++;
 			lastTime = currentTime;
 
 			cameraAngleY += cmdRotateLeft ? 1.0f * deltaTime : 0.0f;
@@ -348,6 +353,12 @@ int main(int argc, char* argv[])
 
 			context.DisplayFrame();	
 		}
+
+		std::chrono::time_point<std::chrono::system_clock> endTP = std::chrono::system_clock::now();
+		std::chrono::duration<float> fsec, fms;
+		fsec = endTP - beginTP;
+		fms = std::chrono::duration_cast<std::chrono::milliseconds>(fsec) * 1000;
+		std::cout << "Average frame time  = " << fms.count() / numTicks << "ms.\n Average FPS = " << 1.0f / (fsec.count() / numTicks);
 	}
 	catch (std::runtime_error e) 
 	{
