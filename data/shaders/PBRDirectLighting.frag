@@ -123,7 +123,7 @@ void main()
     // Test 4 set lights
     vec3 lightPositions[1] = vec3[1]
     (
-        vec3(0.0, 1, 3.0)//,
+        vec3(1, 0, 2.0)//,
         //vec3( 0, 0.5, 3.0),
         //vec3( 3.0, 0.5, 0),
         //vec3( 0, 0.5, -3.0)

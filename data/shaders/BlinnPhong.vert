@@ -26,9 +26,8 @@ void main()
 	// Viewing transformation
 	// Incoming vertex position is multiplied by: modelling matrix, then viewing matrix, then projection matrix
 	// gl_position is a special output variable
-	vec4 pos = MVPMat * vec4(vPosition, 1);
-	gl_Position = pos;
-	positionV = vec3(pos);
+	gl_Position =  MVPMat * vec4(vPosition, 1);
+	positionV =  vec3(modelMat * vec4(vPosition, 1));
 	
 	// Pass through the texture coordinate
 	texCoordV = vTexCoordIn;

@@ -69,21 +69,29 @@ int main(int argc, char* argv[])
 		std::shared_ptr<ePBR::Texture> brdfLUT = context.GetBRDFLookupTexture();
 
 		// Load textures
-		std::shared_ptr<ePBR::PBRMaterial> globalMaterial = std::make_shared<ePBR::PBRMaterial>();
 		auto albedoTex = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\rustediron2\\rustediron2_basecolor.png");
 		auto metalnessTex = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\rustediron2\\rustediron2_metallic.png");
 		auto normalMap = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
 		auto roughnessTex = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
 
-		// Test PBR Material
-		globalMaterial->SetAlbedoTexture(albedoTex);
-		globalMaterial->SetMetalnessMap(metalnessTex);
-		globalMaterial->SetNormalMap(normalMap);
-		globalMaterial->SetRoughnessMap(roughnessTex);
-		globalMaterial->SetShader(IBLOnlyShader);
-		globalMaterial->SetIrradianceMap(convolutedCubeMap1);
-		globalMaterial->SetPrefilterEnvironmentMap(prefilterEnvMap1);
-		globalMaterial->SetBRDFLookupTexture(brdfLUT);
+		// Test IBL Material
+		std::shared_ptr<ePBR::PBRMaterial> IBLMaterial = std::make_shared<ePBR::PBRMaterial>();
+		IBLMaterial->SetAlbedoTexture(albedoTex);
+		IBLMaterial->SetMetalnessMap(metalnessTex);
+		IBLMaterial->SetNormalMap(normalMap);
+		IBLMaterial->SetRoughnessMap(roughnessTex);
+		IBLMaterial->SetShader(IBLOnlyShader);
+		IBLMaterial->SetIrradianceMap(convolutedCubeMap1);
+		IBLMaterial->SetPrefilterEnvironmentMap(prefilterEnvMap1);
+		IBLMaterial->SetBRDFLookupTexture(brdfLUT);
+
+		// Test PBR direct lighting material
+		std::shared_ptr<ePBR::PBRMaterial> directLightingMaterial = std::make_shared<ePBR::PBRMaterial>();
+		directLightingMaterial->SetAlbedoTexture(albedoTex);
+		directLightingMaterial->SetMetalnessMap(metalnessTex);
+		directLightingMaterial->SetNormalMap(normalMap);
+		directLightingMaterial->SetRoughnessMap(roughnessTex);
+		directLightingMaterial->SetShader(directLightingOnlyShader);
 
 		// Test legacy material
 		std::shared_ptr<ePBR::LegacyMaterial> legacyMaterial = std::make_shared<ePBR::LegacyMaterial>();
@@ -99,7 +107,7 @@ int main(int argc, char* argv[])
 		// Set up model
 		std::shared_ptr<ePBR::Model> testModel = std::make_shared<ePBR::Model>();
 		testModel->SetMesh(0, modelMesh);
-		testModel->SetMaterial(0, legacyMaterial);
+		testModel->SetMaterial(0, IBLMaterial);
 
 		// Set up scenes
 		Scene arrayOfSpheresScene;
@@ -111,7 +119,7 @@ int main(int argc, char* argv[])
 			{
 				std::shared_ptr<ePBR::PBRMaterial> mat = std::make_shared<ePBR::PBRMaterial>();
 				std::shared_ptr<ePBR::Model> model = std::make_shared<ePBR::Model>();
-				* mat = * globalMaterial;
+				* mat = * IBLMaterial;
 				*model = *testModel;
 
 				mat->SetAlbedo(glm::vec3(1.0f, 0.0f, 0.0f));
@@ -129,6 +137,16 @@ int main(int argc, char* argv[])
 		singleSphereScene.cameraDistance = (2.0f);
 		singleSphereScene.modelPositions.push_back(glm::vec3(0.0f));
 
+		Scene modelComparisonScene;
+		std::shared_ptr<ePBR::Model> sph1(new ePBR::Model()), sph2(new ePBR::Model()), sph3(new ePBR::Model());
+		*sph1 = *sph2 = *sph3 = *testModel;
+		sph1->SetMaterial(0, IBLMaterial);
+		sph2->SetMaterial(0, directLightingMaterial);
+		sph3->SetMaterial(0, legacyMaterial);
+		modelComparisonScene.models = {sph1, sph2, sph3};
+		modelComparisonScene.modelPositions = { glm::vec3(-2, 0, 0) , glm::vec3(0, 0, 0), glm::vec3(2, 0, 0) };
+		modelComparisonScene.cameraDistance = 4.0f;
+
 		// Controls
 		bool cmdRotateDown(false), cmdRotateUp(false), cmdRotateLeft(false), cmdRotateRight(false);
 		float cameraAngleX(0), cameraAngleY(0);
@@ -137,7 +155,7 @@ int main(int argc, char* argv[])
 		bool isDayEnvironment = true;
 		bool textureSamplingDisbabled = false;
 
-		Scene* currentScene = textureSamplingDisbabled ? &arrayOfSpheresScene : &singleSphereScene;
+		Scene* currentScene = &modelComparisonScene;//textureSamplingDisbabled ? &arrayOfSpheresScene : &singleSphereScene;
 
 		// Timing
 		unsigned int lastTime = SDL_GetTicks();
