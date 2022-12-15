@@ -1,7 +1,0 @@
-25 Sphere benchmark, 3 rotations
-2,403,000 total vertices (96,120 * 25)
-Gather more granular data using NSight
-
-IBLOnly: Avg FPS: 486.16, Avg frametime: 2.06ms
-Direct Lighting Only PBR: Avg FPS: 622.81, Avg frametime: 1.61 
-Blinn-Phong: Avg FPS: 795.23, Avg frametime: 1.26

@@ -66,7 +66,6 @@ int main(int argc, char* argv[])
 		}
 
 		std::shared_ptr<ePBR::CubeMap> selectedSkybox = cubeMap1;
-
 		std::shared_ptr<ePBR::Texture> brdfLUT = context.GetBRDFLookupTexture();
 
 		// Load textures
@@ -75,7 +74,8 @@ int main(int argc, char* argv[])
 		auto normalMap = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\rustediron2\\rustediron2_normal.png");
 		auto roughnessTex = std::make_shared<ePBR::Texture>(pwd + "data\\textures\\rustediron2\\rustediron2_roughness.png");
 
-		// Test IBL Material
+		// CREATE MATERIALS
+		// IBL Material
 		std::shared_ptr<ePBR::PBRMaterial> IBLMaterial = std::make_shared<ePBR::PBRMaterial>();
 		IBLMaterial->SetAlbedoTexture(albedoTex);
 		IBLMaterial->SetMetalnessMap(metalnessTex);
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 		IBLMaterial->SetPrefilterEnvironmentMap(prefilterEnvMap1);
 		IBLMaterial->SetBRDFLookupTexture(brdfLUT);
 
-		// Test PBR direct lighting material
+		// PBR direct lighting material
 		std::shared_ptr<ePBR::PBRMaterial> directLightingMaterial = std::make_shared<ePBR::PBRMaterial>();
 		directLightingMaterial->SetAlbedoTexture(albedoTex);
 		directLightingMaterial->SetMetalnessMap(metalnessTex);
@@ -94,12 +94,13 @@ int main(int argc, char* argv[])
 		directLightingMaterial->SetRoughnessMap(roughnessTex);
 		directLightingMaterial->SetShader(directLightingOnlyShader);
 
-		// Test legacy material
+		// legacy material
 		std::shared_ptr<ePBR::LegacyMaterial> legacyMaterial = std::make_shared<ePBR::LegacyMaterial>();
 		legacyMaterial->SetAlbedoTexture(albedoTex);
 		legacyMaterial->SetNormalMap(normalMap);
 		legacyMaterial->SetShininess(50.0f);
 		legacyMaterial->SetShader(blinnPhongShader);
+		// MATERIAL CREATION DONE
 
 		// Set up mesh
 		std::shared_ptr<ePBR::Mesh> modelMesh = std::make_shared<ePBR::Mesh>();
@@ -110,7 +111,7 @@ int main(int argc, char* argv[])
 		testModel->SetMesh(0, modelMesh);
 		testModel->SetMaterial(0, IBLMaterial);
 
-		// Set up scenes
+		// SET UP SCENES
 		Scene arrayOfSpheresScene;
 		arrayOfSpheresScene.cameraDistance = 7.0f;
 		int sphereSpacing(1.85f);
@@ -120,16 +121,16 @@ int main(int argc, char* argv[])
 			{
 				std::shared_ptr<ePBR::PBRMaterial> mat = std::make_shared<ePBR::PBRMaterial>();
 				std::shared_ptr<ePBR::Model> model = std::make_shared<ePBR::Model>();
-				//* mat = * IBLMaterial;
-				//*model = *testModel;
+				* mat = * IBLMaterial;
+				*model = *testModel;
 
-				//mat->SetAlbedo(glm::vec3(1.0f, 0.0f, 0.0f));
-				//mat->SetMetalness(0.95f - (x / 5.0f));
-				//mat->SetRoughness((y / 5.0f) + 0.05f);
-				//model->SetMaterial(0, mat);
+				mat->SetAlbedo(glm::vec3(1.0f, 0.0f, 0.0f));
+				mat->SetMetalness(0.95f - (x / 5.0f));
+				mat->SetRoughness((y / 5.0f) + 0.05f);
+				mat->SetShader(noSamplersShader);
+				model->SetMaterial(0, mat);
 
-				//arrayOfSpheresScene.models.push_back(model);
-				arrayOfSpheresScene.models.push_back(testModel);
+				arrayOfSpheresScene.models.push_back(model);
 				arrayOfSpheresScene.modelPositions.push_back(glm::vec3( ((-2 * sphereSpacing) + (sphereSpacing * x)), ((-2 * sphereSpacing) + (sphereSpacing * y)), 0.0f ));
 			}
 		}
@@ -148,6 +149,7 @@ int main(int argc, char* argv[])
 		modelComparisonScene.models = {sph1, sph2, sph3};
 		modelComparisonScene.modelPositions = { glm::vec3(-2, 0, 0) , glm::vec3(0, 0, 0), glm::vec3(2, 0, 0) };
 		modelComparisonScene.cameraDistance = 4.0f;
+		// SCENE SETUP COMPLETE
 
 		// Controls
 		bool cmdRotateDown(false), cmdRotateUp(false), cmdRotateLeft(false), cmdRotateRight(false);
@@ -157,7 +159,7 @@ int main(int argc, char* argv[])
 		bool isDayEnvironment = true;
 		bool textureSamplingDisbabled = false;
 
-		Scene* currentScene = &singleSphereScene;//textureSamplingDisbabled ? &arrayOfSpheresScene : &singleSphereScene;
+		Scene* currentScene = &arrayOfSpheresScene;//textureSamplingDisbabled ? &arrayOfSpheresScene : &singleSphereScene;
 
 		// Timing
 		uint64_t lastTime = SDL_GetTicks();
@@ -244,14 +246,15 @@ int main(int argc, char* argv[])
 			// Construct view matrix
 			viewMatrix = glm::rotate(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5f, -currentScene->cameraDistance)), cameraAngleX, glm::vec3(1, 0, 0)), cameraAngleY, glm::vec3(0, 1, 0));
 			camPos = glm::inverse(viewMatrix) * glm::mat4(1) * glm::vec4(0, 0, 0, 1);
-
-			// Render scene
 			renderer.SetCamPos(camPos);
+			renderer.SetProjectionMat(projectionMatrix);
+			renderer.SetViewMat(viewMatrix);
 
+			// Draw all objects in scene
 			for (int i = 0; i < currentScene->models.size(); i++) 
 			{
 				modelMatrix = glm::translate(glm::mat4(1), currentScene->modelPositions[i]);
-				renderer.SetMatrices(modelMatrix, viewMatrix, projectionMatrix);
+				renderer.SetModelMat(modelMatrix);
 				renderer.SetModel(currentScene->models[i]);
 				renderer.Draw();
 			}
@@ -270,8 +273,45 @@ int main(int argc, char* argv[])
 				// This is how you add a bit of text to the window
 				ImGui::Text("Arrow keys rotate the camera");
 
-				// Scene switching
-				if (ImGui::Button("Switch scene"))
+				ImGui::Text("Select a scene:");
+				if (currentScene != &modelComparisonScene && ImGui::Button("Switch to model comparison scene")) 
+				{
+					currentScene = &modelComparisonScene;
+
+					// Make sure environment map is up to date
+					for (auto model : currentScene->models)
+					{
+						std::shared_ptr<ePBR::PBRMaterial> mat = std::dynamic_pointer_cast<ePBR::PBRMaterial>(model->GetMaterials()[0]);
+						if (mat)
+						{
+							mat->SetIrradianceMap(isDayEnvironment ? convolutedCubeMap1 : convolutedCubeMap2);
+							mat->SetPrefilterEnvironmentMap(isDayEnvironment ? prefilterEnvMap1 : prefilterEnvMap2);
+						}
+					}
+				}
+				else if (currentScene != &singleSphereScene && ImGui::Button("Switch to single sphere scene"))
+				{
+					currentScene = &singleSphereScene;
+
+					// Make sure environment map is up to date
+					for (auto model : currentScene->models)
+					{
+						std::shared_ptr<ePBR::PBRMaterial> mat = std::dynamic_pointer_cast<ePBR::PBRMaterial>(model->GetMaterials()[0]);
+						if (mat)
+						{
+							mat->SetIrradianceMap(isDayEnvironment ? convolutedCubeMap1 : convolutedCubeMap2);
+							mat->SetPrefilterEnvironmentMap(isDayEnvironment ? prefilterEnvMap1 : prefilterEnvMap2);
+						}
+					}
+				}
+				else if (currentScene != &arrayOfSpheresScene && ImGui::Button("Switch to array of spheres scene"))
+				{
+					currentScene = &arrayOfSpheresScene;
+				}
+
+				// Environment map switching
+				ImGui::Text("Manage environment map:");
+				if (ImGui::Button("Swap environment map"))
 				{
 					if (isDayEnvironment)
 					{
@@ -300,43 +340,6 @@ int main(int argc, char* argv[])
 						}
 						selectedSkybox = cubeMap1;
 						isDayEnvironment = !isDayEnvironment;
-					}
-				}
-
-				// Switch objects
-				bool inArrayScene = currentScene == &arrayOfSpheresScene;
-				if (ImGui::Button(inArrayScene ? "Switch to single sphere" : "Switch to array of spheres")) 
-				{
-					currentScene = inArrayScene ? &singleSphereScene : &arrayOfSpheresScene;
-				}
-
-				// Disable sampling
-				if (ImGui::Button(textureSamplingDisbabled ? "Enable texture sampling" : "Disable texure sampling")) 
-				{
-					for (auto model : currentScene->models)
-					{
-						model->GetMaterials()[0]->SetShader(textureSamplingDisbabled ? (useIBLShader ? IBLOnlyShader : directLightingOnlyShader) : noSamplersShader);
-					}
-					textureSamplingDisbabled = !textureSamplingDisbabled;
-				}
-
-				// Shader switching
-				if (ImGui::Button("Use IBL only shader"))
-				{
-					useIBLShader = true;
-					textureSamplingDisbabled = false;
-					for (auto model : currentScene->models)
-					{
-						model->GetMaterials()[0]->SetShader(IBLOnlyShader);
-					}
-				}
-				if (ImGui::Button("Use direct lighting only shader"))
-				{
-					useIBLShader = false;
-					textureSamplingDisbabled = false;
-					for (auto model : currentScene->models)
-					{
-						model->GetMaterials()[0]->SetShader(directLightingOnlyShader);
 					}
 				}
 

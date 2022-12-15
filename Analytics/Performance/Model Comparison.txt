@@ -1,6 +1,0 @@
-RenderDoc glDrawArrays timings
-96120 vertices each.
-
-IBL Only Shader = 65.76 microseconds
-Direct lighting only PBR Shader = 36.92
-Blinn-Phong = 27.12
