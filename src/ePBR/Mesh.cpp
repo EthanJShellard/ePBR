@@ -49,7 +49,6 @@ namespace ePBR
 			while (std::getline(inputFile, currentLine))
 			{
 				std::stringstream currentLineStream(currentLine);
-				//std::cout<< currentLine <<std::endl;
 
 				if (!currentLine.substr(0, 2).compare(0, 2, "vt"))
 				{

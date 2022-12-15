@@ -13,8 +13,8 @@ namespace ePBR
 		m_camPos(0.0f),
 		m_clearColour(0.0f,0.0f,0.0f,1.0f),
 		m_depthTest(true),
-		m_backfaceCull(false),
-		m_blend(false),
+		m_backfaceCull(true),
+		m_blend(true),
 		m_width(_width),
 		m_height(_height)
 	{

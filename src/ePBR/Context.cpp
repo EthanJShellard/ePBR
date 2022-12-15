@@ -455,7 +455,8 @@ namespace ePBR
 		ImGui_ImplSDL2_Shutdown();
 		ImGui::DestroyContext();
 
-		// Our cleanup phase, hopefully fairly self-explanatory ;)
+		// Clean up openGL and SDL.
+		//Consider leaving the SDL window around if it was provided in constructor.
 		SDL_GL_DeleteContext(m_SDL_GL_Context);
 		SDL_DestroyRenderer(m_SDL_Renderer);
 		SDL_DestroyWindow(m_window);

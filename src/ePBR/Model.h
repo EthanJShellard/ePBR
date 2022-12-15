@@ -37,7 +37,7 @@ namespace ePBR
 		/// @param _newMesh The new Mesh.
 		void SetMesh(int _index, std::shared_ptr<Mesh> _newMesh);
 
-		/// @brief Load a model from a file.
+		/// @brief Load a model from a file. (WARNING - NOT VALIDATED)
 		/// @param _filename The path to the model to load.
 		void Load(const std::string& _filename);
 

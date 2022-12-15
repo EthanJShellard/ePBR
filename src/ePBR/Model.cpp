@@ -111,7 +111,6 @@ namespace ePBR
 			
 		}
 
-
 		if (scene->HasMeshes())
 		{
 			// Resize vectors
