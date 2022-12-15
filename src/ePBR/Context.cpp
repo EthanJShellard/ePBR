@@ -171,6 +171,7 @@ namespace ePBR
 		return std::shared_ptr<CubeMap>(new CubeMap(DEFAULT_CUBEMAP_WIDTH, _equirectangularMap, m_cubeMapGenerationShader));
 	}
 
+	// Inspired by https://learnopengl.com/PBR/IBL/Diffuse-irradiance
 	void Context::RenderSkyBox(std::shared_ptr<CubeMap> _environmentMap, const glm::mat4& _viewMat, const glm::mat4& _projectionMat)
 	{
 		if (!m_unitCube) 
@@ -203,6 +204,7 @@ namespace ePBR
 		m_unitCube->Draw();
 	}
 
+	// Inspired by https://learnopengl.com/PBR/IBL/Diffuse-irradiance
 	std::shared_ptr<CubeMap> Context::GenerateDiffuseIrradianceMap(std::shared_ptr<CubeMap> _cubeMap) 
 	{
 		if (!m_unitCube) 
@@ -294,7 +296,7 @@ namespace ePBR
 
 		return conv;
 	}
-
+	 // Inspired by https://learnopengl.com/PBR/IBL/Specular-IBL
 	std::shared_ptr<CubeMap> Context::GeneratePrefilterIrradianceMap(std::shared_ptr<CubeMap> _cubeMap)
 	{
 		if (!m_unitCube) 
@@ -383,6 +385,7 @@ namespace ePBR
 		return prefilterMap;
 	}
 
+	// Inspired by https://learnopengl.com/PBR/IBL/Specular-IBL
 	std::shared_ptr<Texture> Context::GetBRDFLookupTexture() 
 	{
 		if (m_BRDFLUT) return m_BRDFLUT;

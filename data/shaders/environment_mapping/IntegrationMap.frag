@@ -8,6 +8,7 @@ out vec2 fragColour;
 
 const float PI = 3.14159265359;
 
+// https://learnopengl.com/PBR/IBL/Specular-IBL
 // Van Der Corput sequence.
 float RadicalInverse_Vdc(uint bits)
 {
@@ -20,12 +21,14 @@ float RadicalInverse_Vdc(uint bits)
     return float(bits) * 2.3283064365386963e-10; // / 0x100000000
 }
 
+// https://learnopengl.com/PBR/IBL/Specular-IBL
 // Hammersly sequence for low-discrepancy samples, based on the Quasi-Monte Carlo method.
 vec2 Hammersly(uint i, uint N)
 {
     return vec2(float(i)/float(N), RadicalInverse_Vdc(i));
 }
 
+// https://learnopengl.com/PBR/IBL/Specular-IBL
 // Orient and bias sample vector torwards specular lobe. Using GGX NDF as described by Epic Games.
 vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
 {
@@ -50,6 +53,7 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
     return normalize(sampleVec);
 }
 
+// https://learnopengl.com/PBR/IBL/Lighting
 // GeometrySchlickGGX
 float GeometrySchlickGGX(float nDotV, float roughness)
 {
@@ -62,6 +66,7 @@ float GeometrySchlickGGX(float nDotV, float roughness)
     return num / denom;
 }
 
+// https://learnopengl.com/PBR/IBL/Lighting
 // GeometrySmith
 float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 {
@@ -73,6 +78,7 @@ float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
     return ggx1 * ggx2;
 }
 
+// https://learnopengl.com/PBR/IBL/Specular-IBL
 vec2 IntegrateBRDF(float NdotV, float roughness)
 {
     vec3 V;

@@ -28,12 +28,14 @@ out vec4 fragColour;
 // Define PI
 const float PI = 3.14159265359;
 
+// https://learnopengl.com/PBR/Lighting
 // Calculate the ratio between specular and diffuse reflection.
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+// https://learnopengl.com/PBR/Lighting
 // Fresnel schlick but with injected roughness. To be used when sampling an irradiance map as we will have no one halfway vector.
 // Uses technique described by Sebastien Lagarde.
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
@@ -65,6 +67,7 @@ void main()
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, texAlbedo, texMetalness);
 
+    // https://learnopengl.com/PBR/Specular-IBL
     // Get prefiltered reflection colour
     vec3 R = reflect(-viewDir, normal);
     const float MAX_REFLECTION_LOD = 4.0; // Using 5 mip levels

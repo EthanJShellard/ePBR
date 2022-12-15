@@ -7,6 +7,7 @@ uniform sampler2D equirectangularMap;
 
 const vec2 invAtan = vec2(0.1591, 0.3183);
 
+// https://learnopengl.com/PBR/IBL/Diffuse-irradiance
 // Spherical to cartesian trig magic
 vec2 SampleSphericalMap(vec3 v)
 {
@@ -16,6 +17,7 @@ vec2 SampleSphericalMap(vec3 v)
     return uv;
 }
 
+// https://learnopengl.com/PBR/IBL/Diffuse-irradiance
 void main()
 {
     vec2 uv = SampleSphericalMap(normalize(localPos));

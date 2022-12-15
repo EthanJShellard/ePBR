@@ -40,7 +40,6 @@ int main(int argc, char* argv[])
 
 	// Load Shaders
 	std::shared_ptr<ePBR::Shader> comboPBRShader, IBLOnlyShader, directLightingOnlyShader, noSamplersShader, blinnPhongShader;
-	comboPBRShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBR.frag");
 	IBLOnlyShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRIBL.frag");
 	directLightingOnlyShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRDirectLighting.frag");
 	noSamplersShader = std::make_shared<ePBR::Shader>(pwd + "data\\shaders\\PBR.vert", pwd + "data\\shaders\\PBRNoSamplers.frag");

@@ -35,12 +35,14 @@ out vec4 fragColour;
 const float PI = 3.14159265359;
 const float e = 2.71828;
 
+// https://learnopengl.com/PBR/Lighting
 // Calculate the ratio between specular and diffuse reflection.
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+// https://learnopengl.com/PBR/Lighting
 // Fresnel schlick but with injected roughness. To be used when sampling an irradiance map as we will have no one halfway vector.
 // Uses technique described by Sebastien Lagarde.
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
@@ -48,7 +50,8 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-// Test DistributionGGX (NDF)
+// https://learnopengl.com/PBR/Lighting
+// DistributionGGX (NDF)
 float DistributionGGX(vec3 normal, vec3 halfVec, float roughness)
 {
     float a = roughness * roughness;
@@ -63,7 +66,7 @@ float DistributionGGX(vec3 normal, vec3 halfVec, float roughness)
     return num / denom;
 }
 
-// Test Beckmann Distribution (NDF)
+// Beckmann Distribution (NDF)
 float BeckmannDistribution(float NDotH, float roughness)
 {
     float r2 = roughness * roughness;
@@ -73,7 +76,8 @@ float BeckmannDistribution(float NDotH, float roughness)
     return (numerator / denom);
 }
 
-// Test GeometrySchlickGGX
+// https://learnopengl.com/PBR/Lighting
+// GeometrySchlickGGX
 float GeometrySchlickGGX(float nDotV, float roughness)
 {
     float r = (roughness + 1.0);
@@ -85,7 +89,8 @@ float GeometrySchlickGGX(float nDotV, float roughness)
     return num / denom;
 }
 
-// Test GeometrySmith
+// https://learnopengl.com/PBR/Lighting
+// GeometrySmith
 float GeometrySmith(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 {
     float nDotV = max(dot(normal, viewDir), 0.0);
@@ -150,9 +155,9 @@ void main()
         // Calculate fresnel
         vec3 F = fresnelSchlick(max(dot(halfVec, viewDir), 0.0), F0);
 
-         // Calculate geometry occlusion
+        // Calculate geometry occlusion
         float G = GeometrySmith(normal, viewDir, lightDir, texRoughness);
-         // Calculate normal distribution
+        // Calculate normal distribution
         float NDF = DistributionGGX(normal, halfVec, texRoughness);
         //float NDF = BeckmannDistribution(max(dot(normal, halfVec), 0.0), texRoughness);
 
